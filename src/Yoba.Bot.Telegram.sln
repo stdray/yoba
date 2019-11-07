@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yoba.Bot", "Yoba.Bot\Yoba.B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yoba.Bot.Db", "Yoba.Bot.Db\Yoba.Bot.Db.csproj", "{8F00DADB-6197-4DD4-87A0-F6FE57617770}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yoba.Bot.Tests", "Yoba.Bot.Tests\Yoba.Bot.Tests.csproj", "{C3E21575-B265-4574-A928-46BA8460607B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{8F00DADB-6197-4DD4-87A0-F6FE57617770}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F00DADB-6197-4DD4-87A0-F6FE57617770}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F00DADB-6197-4DD4-87A0-F6FE57617770}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3E21575-B265-4574-A928-46BA8460607B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3E21575-B265-4574-A928-46BA8460607B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3E21575-B265-4574-A928-46BA8460607B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3E21575-B265-4574-A928-46BA8460607B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

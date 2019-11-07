@@ -1,26 +1,36 @@
-﻿//using System.Threading;
-//using System.Threading.Tasks;
-//
-//namespace Yoba.Bot
-//{
-//    public abstract class RequestPipe<TMsg>
-//    {
-////        readonly MiddlewareCollection<TMsg> _middlewareCollection;
-//        readonly HandlerCollection<TMsg> _handlerCollection;
-//
-//        protected RequestPipe(HandlerCollection<TMsg> handlerCollection
-////            MiddlewareCollection<TMsg> middlewareCollection = null
-//            )
-//        {
-//            _handlerCollection = handlerCollection;
-////            _middlewareCollection = middlewareCollection ?? new MiddlewareCollection<TMsg>();
-//        }
-//
-//        public async Task Handle(Request<TMsg> request, CancellationToken cancellation)
-//        {
-//            foreach (var handler in _handlerCollection)
-//                if (await handler.Handle(request, cancellation))
-//                    break;
-//        }
-//    }
-//}
+﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Yoba.Bot
+{
+    public abstract class RequestPipe<TMsg>
+    {
+        readonly IEnumerable<IMiddleware<TMsg>> _middlewares;
+        readonly IEnumerable<IHandler<TMsg>> _handlers;
+
+        protected RequestPipe(
+            IEnumerable<IHandler<TMsg>> handlers,
+            IEnumerable<IMiddleware<TMsg>> middlewares = null)
+        {
+            _handlers = handlers;
+            _middlewares ??= new List<TMsg>();
+        }
+
+        public async Task<Result> Handle(Request<TMsg> request, CancellationToken cancel)
+        {
+            var result = Result.Skip();
+            foreach (var middleware in _middlewares)
+            {
+                await middleware.Execute(request, cancel);
+            }
+            foreach (var handler in _handlers)
+            {
+                result = await handler.Handle(request, cancel);
+                if ((result.Status & Status.Success) != 0)
+                    break;
+            }
+            return result;
+        }
+    }
+}

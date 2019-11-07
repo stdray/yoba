@@ -16,13 +16,13 @@ namespace Yoba.Bot
         public TMsg Message { get; }
 
         public async Task<TProp> GetProperty<TProp>(string key,
-            TProp defaultValue = default(TProp),
-            CancellationToken cancellation = default(CancellationToken))
+            TProp @default = default(TProp),
+            CancellationToken cancel = default(CancellationToken))
         {
             if (!_properties.TryGetValue(key, out var value))
-                return defaultValue;
+                return @default;
             if (value is IProvider<TMsg, TProp> provider)
-                return await provider.Provide(key, Message, defaultValue, cancellation);
+                return await provider.Provide(key, Message, @default, cancel);
             return (TProp) value;
         }
 

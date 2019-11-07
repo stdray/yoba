@@ -4,20 +4,20 @@ using System.Threading.Tasks;
 
 namespace Yoba.Bot.Telegram.Controllers
 {
-    public class ProfileController : TelegramController
-    {
-        public ProfileController()
-        {
-            Add(new Regex(@"^(лойс|слив|) (?<name>.+)$"),
-                (r, m) => new {name = m.Groups["name"].Value},
-                async (context, cancel) =>
-                {
-                    await Task.Delay(32);
-                    Console.Write(context.name);
-                    return Result.Skip;
-                });
-        }
-    }
+//    public class ProfileController : TelegramController
+//    {
+//        public ProfileController()
+//        {
+//            Add(new Regex(@"^(лойс|слив) (?<name>.+)$"),
+//                m => new {name = m.Groups["name"].Value},
+//                async (msg, context, cancel) =>
+//                {
+//                    await Task.Delay(32);
+//                    Console.Write(context.name);
+//                    return Result.Skip;
+//                });
+//        }
+//    }
 }
 //    public class ProfileHandler : IHandler<Message>
 //    {
