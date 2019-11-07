@@ -1,13 +1,10 @@
-using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Telegram.Bot.Types;
 using Xunit;
 using Xunit.Abstractions;
-using Yoba.Bot.Telegram.Controllers;
+using Yoba.Bot.Telegram;
 
 namespace Yoba.Bot.Tests
 {
@@ -18,7 +15,7 @@ namespace Yoba.Bot.Tests
 
         public SimpleCommandControllerTests(ITestOutputHelper output)
         {
-            this._output = output;
+            _output = output;
             _controller = Setup.GetService<SimpleCommandController>();
         }
 
@@ -28,7 +25,7 @@ namespace Yoba.Bot.Tests
         [InlineData("pong", "  пинг  ")]
         [InlineData("pong", "  ping  ")]
         [InlineData("1.0.0.0", "  ёба версия  ")]
-        public async Task Bot_Response_ShouldBeExpected(string expected, string request)
+        public async Task Bot_Response_ShouldBe_Expected(string expected, string request)
         {
             var req = Setup.Message(request);
             var res1 =  await _controller.Handle(req, CancellationToken.None);

@@ -10,10 +10,10 @@ namespace Yoba.Bot
             Exception = error;
         }
 
-        public static Result Success() => new Result(Bot.Status.Success, null);
-        public static Result Error(Exception error) => new Result(Bot.Status.Fail, error);
+        public static Result Success() => new Result(Status.Success, null);
+        public static Result Error(Exception error) => new Result(Status.Fail, error);
 
-        public static Result Skip () => new Result(Bot.Status.None, null);
+        public static Result Skip () => new Result(Status.None, null);
 
         public Exception Exception { get; }
 

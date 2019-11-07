@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,7 +15,4 @@ namespace Yoba.Bot
         public Task<Result> Handle(Request<TMsg> request, CancellationToken cancel) => 
             _handle(request, cancel);
     }
-
-    public delegate Task<Result> SimpleHandle<TMsg>(Request<TMsg> request, CancellationToken cancel);
-
 }

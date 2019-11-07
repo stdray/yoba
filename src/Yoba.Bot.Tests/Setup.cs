@@ -8,13 +8,13 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
-using Yoba.Bot.Telegram.Controllers;
+using Yoba.Bot.Telegram;
 
 namespace Yoba.Bot.Tests
 {
-    public class Setup
+    public static class Setup
     {
-        public static readonly Lazy<IServiceProvider> ServiceProvider =
+        static readonly Lazy<IServiceProvider> ServiceProvider =
             new Lazy<IServiceProvider>(Configure, LazyThreadSafetyMode.ExecutionAndPublication);
 
         public static T GetService<T>() => ServiceProvider.Value.GetService<T>();
@@ -29,8 +29,9 @@ namespace Yoba.Bot.Tests
         static IServiceProvider Configure()
         {
             var sc = new ServiceCollection();
-            sc.AddScoped(_ => CreateTelegramBotClient());
-            sc.AddScoped<SimpleCommandController>();
+            sc.AddSingleton<IProvider<Message>, TelegramTextProvider>();
+            sc.AddSingleton(_ => CreateTelegramBotClient());
+            sc.AddSingleton<SimpleCommandController>();
             return sc.BuildServiceProvider();
         }
 

@@ -7,11 +7,13 @@ namespace Yoba.Bot
 {
     public class RegexAction<TMsg> : IHandler<TMsg>
     {
+        readonly IProvider<TMsg, string> _textProvider;
         readonly Regex _regex;
         readonly MatchHandle<TMsg> _handle;
 
-        public RegexAction(Regex regex, MatchHandle<TMsg> handle)
+        public RegexAction(IProvider<TMsg, string> textProvider, Regex regex, MatchHandle<TMsg> handle)
         {
+            _textProvider = textProvider;
             _regex = regex;
             _handle = handle;
         }
@@ -20,7 +22,9 @@ namespace Yoba.Bot
         {
             try
             {
-                var text = await request.GetProperty<string>(Property.Text, cancel: cancel);
+                var text = await _textProvider.Provide(request.Message, null, cancel);
+                if (string.IsNullOrEmpty(text))
+                    return Result.Skip();
                 var match = _regex.Match(text);
                 if (!match.Success)
                     return Result.Skip();

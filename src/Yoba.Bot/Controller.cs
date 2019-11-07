@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,7 +7,13 @@ namespace Yoba.Bot
 {
     public class Controller<TMsg> : IController<TMsg>
     {
+        public IReadOnlyCollection<IProvider<TMsg>> Providers { get; }
         readonly List<IHandler<TMsg>> _actions = new List<IHandler<TMsg>>();
+
+        protected Controller(IEnumerable<IProvider<TMsg>> providers)
+        {
+            Providers = providers?.ToList() ?? new List<IProvider<TMsg>>(0);
+        }
 
         public void Add(IHandler<TMsg> action) => _actions.Add(action);
 

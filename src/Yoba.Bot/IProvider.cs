@@ -3,9 +3,14 @@ using System.Threading.Tasks;
 
 namespace Yoba.Bot
 {
-    public interface IProvider<in TMsg, TProp>
+    public interface IProvider<TMsg>
     {
-        Task<TProp> Provide(string key, TMsg message,
+        
+    }
+    
+    public interface IProvider<TMsg, TProp> : IProvider<TMsg>
+    {
+        Task<TProp> Provide(TMsg message,
             TProp defaultValue = default(TProp),
             CancellationToken cancellation = default(CancellationToken));
     }

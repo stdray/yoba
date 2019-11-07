@@ -14,7 +14,7 @@ namespace Yoba.Bot
             IEnumerable<IMiddleware<TMsg>> middlewares = null)
         {
             _handlers = handlers;
-            _middlewares ??= new List<TMsg>();
+            _middlewares = _middlewares ?? new List<IMiddleware<TMsg>>();
         }
 
         public async Task<Result> Handle(Request<TMsg> request, CancellationToken cancel)
