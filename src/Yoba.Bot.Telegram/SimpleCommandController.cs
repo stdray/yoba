@@ -1,54 +1,82 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using BinaryAnalysis.UnidecodeSharp;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Yoba.Bot.RegularExpressions;
 using static Yoba.Bot.Telegram.Shared;
+using static Yoba.Bot.RegularExpressions.Dsl;
+
+// ReSharper disable InconsistentNaming
 
 namespace Yoba.Bot.Telegram
 {
     public class SimpleCommandController : Controller<Message>
     {
         readonly ITelegramBotClient _telegram;
+        readonly IRandomGenerator _random;
 
-        public SimpleCommandController(IEnumerable<IProvider<Message>> providers, ITelegramBotClient telegram) 
-            : base(providers)
+        public SimpleCommandController(IEnumerable<IProvider<Message>> providers, ITelegramBotClient telegram,
+            IRandomGenerator random) : base(providers)
         {
             _telegram = telegram;
+            _random = random;
 
             Ping();
             Version();
-//            Vanga();
+            Vanga();
+            Translit();
         }
 
-//        void Vanga()
-//        {
-//            const string answers = @"(?<answers>(.+?)(?:,|или|$)";
-//            const string question = @"(?<question>[^:]*)?";
-//            var pattern = $@"{BotName}(вангуй)\s+{question}\s*{answers}";
-//            this.AddRegexRule(
-//                new Regex(pattern), 
-//                async (request, match, cancel) =>
-//                {
-//                    var answers = match.Groups["answers"].Value
-//                        .Split(new[] {",", " или "}, StringSplitOptions.RemoveEmptyEntries)
-//                        .Select(x => x.Trim())
-//                        .ToList();
-//                    
-//                    return Ok(await _telegram.ReplyAsync(request, text, cancel));
-//                });
-//        }
+        void Translit() => this.AddReRule(
+            bot + anyOf("транслитом", "translit") + anyCh.oneOrMore.group("text"),
+            async (request, match, cancel) =>
+            {
+                var text = match.Values("text").Single();
+                return Ok(await _telegram.ReplyAsync(request, text.Unidecode(), cancel));
+            });
 
-        void Version() => this.AddRegexRule(
-            new Regex($@"^\s*{BotName}\s*(version|версия)\s*$"),
+        void Vanga()
+        {
+            const string name = "answers";
+            Re phrase(string n) => anyCh.weakAny.group(n);
+            var sp = ws + "или" + ws | ",";
+            var vanga = anyOf("вангуй", "гадай");
+            var question = phrase(string.Empty);
+            var answers = ws.opt + phrase(name) + (sp + phrase(name)).oneOrMore;
+
+            async Task<Result> Reply(Request<Message> request, Match match, CancellationToken cancel)
+            {
+                var defaultAnswers = new[]
+                {
+                    "да", "нет", "это не важно", "спок, бро", "толсто",
+                    "да, хотя зря", "никогда", "100%", "1 из 100"
+                };
+                var choices = match.Values(name).ToArray();
+                choices = choices.Any() ? choices : defaultAnswers;
+                var choice = choices[_random.Next(0, choices.Length)];
+                return Ok(await _telegram.ReplyAsync(request, choice, cancel));
+            }
+
+            this.AddReRule(bot + vanga + ws + question + ws.opt + ":" + answers + "?".opt(), Reply);
+            this.AddReRule(bot + vanga + ws + answers + "?".opt(), Reply);
+            this.AddReRule(bot + vanga + ws + question + "?".opt(), Reply);
+        }
+
+        void Version() => this.AddReRule(
+            bot + anyOf("версия", "version"),
             async (request, _, cancel) =>
             {
                 var text = Assembly.GetExecutingAssembly().GetName().Version.ToString();
                 return Ok(await _telegram.ReplyAsync(request, text, cancel));
             });
 
-        void Ping() => this.AddRegexRule(
-            new Regex(@"^\s*(?<cmd>ping|пинг|1)\s*$"),
+        void Ping() => this.AddReRule(
+            anyOf("ping", "пинг", "1").group("cmd"),
             async (request, match, cancel) =>
             {
                 var cmd = match.Groups["cmd"].Value.Trim();

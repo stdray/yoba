@@ -25,6 +25,10 @@ namespace Yoba.Bot.Tests
         [InlineData("pong", "  пинг  ")]
         [InlineData("pong", "  ping  ")]
         [InlineData("1.0.0.0", "  ёба версия  ")]
+        [InlineData("боксифаг", "  ёба вангуй кто лелка: зхц, боксифаг, котовский, или пес ?  ")]
+        [InlineData("нет", "  yoba гадай математики = гуманитарии ?  ")]
+        [InlineData("гуманитарии", "  yoba вангуй математики, гуманитарии или транскоалиция   ")]
+        [InlineData("batmansy", "  yoba транслитом батмансы")]
         public async Task Bot_Response_ShouldBe_Expected(string expected, string request)
         {
             var req = Setup.Message(request);

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -31,15 +30,22 @@ namespace Yoba.Bot.Tests
             var sc = new ServiceCollection();
             sc.AddSingleton<IProvider<Message>, TelegramTextProvider>();
             sc.AddSingleton(_ => CreateTelegramBotClient());
+            sc.AddSingleton(CreateRandomGenerator(1));
             sc.AddSingleton<SimpleCommandController>();
             return sc.BuildServiceProvider();
         }
 
+        static IRandomGenerator CreateRandomGenerator(int returnNum)
+        {
+            var random = A.Fake<IRandomGenerator>();
+            A.CallTo(() => random.Next(A<int>.Ignored, A<int>.Ignored))
+                .Returns(returnNum);
+            return random;
+        }
+
         static ITelegramBotClient CreateTelegramBotClient()
         {
-            var messages = new List<Message>();
             var telegram = A.Fake<ITelegramBotClient>();
-
             A.CallTo(() => telegram.SendTextMessageAsync(
                     A<ChatId>.Ignored,
                     A<string>.Ignored,

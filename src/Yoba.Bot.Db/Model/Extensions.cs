@@ -1,4 +1,0 @@
-namespace Yoba.Bot.Db
-{
-
-}

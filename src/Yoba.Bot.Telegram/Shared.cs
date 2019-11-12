@@ -1,7 +1,10 @@
+using Yoba.Bot.RegularExpressions;
+using static Yoba.Bot.RegularExpressions.Dsl;
+
 namespace Yoba.Bot.Telegram
 {
     public static class Shared
     {
-        public const string BotName = @"\s*(?<botName>(yoba|ёба|еба|ёбамысо))\s+";
+        public static Re bot { get; } = anyOf("yoba", "ёба", "ёбамысо") + ws.oneOrMore;
     }
 }

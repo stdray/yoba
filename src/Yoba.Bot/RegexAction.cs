@@ -23,6 +23,7 @@ namespace Yoba.Bot
             try
             {
                 var text = await _textProvider.Provide(request.Message, null, cancel);
+                text = text?.Trim();
                 if (string.IsNullOrEmpty(text))
                     return Result.Skip();
                 var match = _regex.Match(text);
