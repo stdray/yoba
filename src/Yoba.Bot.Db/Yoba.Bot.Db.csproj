@@ -5,8 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="linq2db" Version="2.9.3" />
-    <PackageReference Include="linq2db.SqlServer" Version="2.9.3" />
+    <PackageReference Include="linq2db.SQLite" Version="2.9.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,6 +25,10 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Db.tt</DependentUpon>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Yoba.Bot.Entities\Yoba.Bot.Entities.csproj" />
   </ItemGroup>
 
 </Project>

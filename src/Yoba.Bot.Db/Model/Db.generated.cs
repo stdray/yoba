@@ -9,22 +9,19 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 
 using LinqToDB;
-using LinqToDB.Common;
-using LinqToDB.Data;
 using LinqToDB.Mapping;
 
 namespace Yoba.Bot.Db
 {
 	/// <summary>
-	/// Database       : YobaBot
-	/// Data Source    : (LocalDb)\MSSQLLocalDB
-	/// Server Version : 13.00.4001
+	/// Database       : YobaDB
+	/// Data Source    : YobaDB
+	/// Server Version : 3.19.3
 	/// </summary>
-	public partial class YobaBotDB : LinqToDB.Data.DataConnection
+	public partial class YobaDb : LinqToDB.Data.DataConnection
 	{
 		public ITable<Attribute>        Attributes        { get { return this.GetTable<Attribute>(); } }
 		public ITable<Note>             Notes             { get { return this.GetTable<Note>(); } }
@@ -33,13 +30,13 @@ namespace Yoba.Bot.Db
 		public ITable<ProfileJid>       ProfileJids       { get { return this.GetTable<ProfileJid>(); } }
 		public ITable<ProfileName>      ProfileNames      { get { return this.GetTable<ProfileName>(); } }
 
-		public YobaBotDB()
+		public YobaDb()
 		{
 			InitDataContext();
 			InitMappingSchema();
 		}
 
-		public YobaBotDB(string configuration)
+		public YobaDb(string configuration)
 			: base(configuration)
 		{
 			InitDataContext();
@@ -50,7 +47,7 @@ namespace Yoba.Bot.Db
 		partial void InitMappingSchema();
 	}
 
-	[Table(Schema="dbo", Name="Attribute")]
+	[Table("Attribute")]
 	public partial class Attribute
 	{
 		[Column("Attribute"),             NotNull] public string Attribute_Column { get; set; } // nvarchar(200)
@@ -59,7 +56,7 @@ namespace Yoba.Bot.Db
 		#region Associations
 
 		/// <summary>
-		/// FK_ProfileAttribute_Attribute_BackReference
+		/// FK_ProfileAttribute_1_0_BackReference
 		/// </summary>
 		[Association(ThisKey="Id", OtherKey="AttributeId", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<ProfileAttribute> ProfileAttributes { get; set; }
@@ -67,17 +64,17 @@ namespace Yoba.Bot.Db
 		#endregion
 	}
 
-	[Table(Schema="dbo", Name="Note")]
+	[Table("Note")]
 	public partial class Note
 	{
 		[PrimaryKey, NotNull] public string   NoteName        { get; set; } // nvarchar(140)
-		[Column,     NotNull] public string   Content         { get; set; } // nvarchar(max)
+		[Column,     NotNull] public string   Content         { get; set; } // ntext(max)
 		[Column,     NotNull] public DateTime Added           { get; set; } // datetime
 		[Column,     NotNull] public string   DisplayNoteName { get; set; } // nvarchar(200)
 		[Column,     NotNull] public DateTime Updated         { get; set; } // datetime
 	}
 
-	[Table(Schema="dbo", Name="Profile")]
+	[Table("Profile")]
 	public partial class Profile
 	{
 		[PrimaryKey, NotNull] public Guid   Id          { get; set; } // uniqueidentifier
@@ -91,19 +88,19 @@ namespace Yoba.Bot.Db
 		#region Associations
 
 		/// <summary>
-		/// FK_ProfileAttribute_Profile_BackReference
+		/// FK_ProfileAttribute_0_0_BackReference
 		/// </summary>
 		[Association(ThisKey="Id", OtherKey="ProfileId", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<ProfileAttribute> ProfileAttributes { get; set; }
 
 		/// <summary>
-		/// FK_ProfileJid_Profile_BackReference
+		/// FK_ProfileJid_0_0_BackReference
 		/// </summary>
 		[Association(ThisKey="Id", OtherKey="ProfileId", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<ProfileJid> ProfileJids { get; set; }
 
 		/// <summary>
-		/// FK_ProfileName_Profile_BackReference
+		/// FK_ProfileName_0_0_BackReference
 		/// </summary>
 		[Association(ThisKey="Id", OtherKey="ProfileId", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<ProfileName> ProfileNames { get; set; }
@@ -111,73 +108,60 @@ namespace Yoba.Bot.Db
 		#endregion
 	}
 
-	[Table(Schema="dbo", Name="ProfileAttribute")]
+	[Table("ProfileAttribute")]
 	public partial class ProfileAttribute
 	{
-		[PrimaryKey(1), NotNull] public Guid   ProfileId   { get; set; } // uniqueidentifier
-		[PrimaryKey(2), NotNull] public Guid   AttributeId { get; set; } // uniqueidentifier
-		[Column,        NotNull] public string Value       { get; set; } // nvarchar(max)
+		[PrimaryKey(0), NotNull] public Guid   ProfileId   { get; set; } // uniqueidentifier
+		[PrimaryKey(1), NotNull] public Guid   AttributeId { get; set; } // uniqueidentifier
+		[Column,        NotNull] public string Value       { get; set; } // ntext(max)
 
 		#region Associations
 
 		/// <summary>
-		/// FK_ProfileAttribute_Attribute
+		/// FK_ProfileAttribute_1_0
 		/// </summary>
-		[Association(ThisKey="AttributeId", OtherKey="Id", CanBeNull=false, Relationship=Relationship.ManyToOne, KeyName="FK_ProfileAttribute_Attribute", BackReferenceName="ProfileAttributes")]
+		[Association(ThisKey="AttributeId", OtherKey="Id", CanBeNull=false, Relationship=Relationship.ManyToOne, KeyName="FK_ProfileAttribute_1_0", BackReferenceName="ProfileAttributes")]
 		public Attribute Attribute { get; set; }
 
 		/// <summary>
-		/// FK_ProfileAttribute_Profile
+		/// FK_ProfileAttribute_0_0
 		/// </summary>
-		[Association(ThisKey="ProfileId", OtherKey="Id", CanBeNull=false, Relationship=Relationship.ManyToOne, KeyName="FK_ProfileAttribute_Profile", BackReferenceName="ProfileAttributes")]
+		[Association(ThisKey="ProfileId", OtherKey="Id", CanBeNull=false, Relationship=Relationship.ManyToOne, KeyName="FK_ProfileAttribute_0_0", BackReferenceName="ProfileAttributes")]
 		public Profile Profile { get; set; }
 
 		#endregion
 	}
 
-	[Table(Schema="dbo", Name="ProfileJid")]
+	[Table("ProfileJid")]
 	public partial class ProfileJid
 	{
-		[PrimaryKey(1), NotNull] public Guid   ProfileId { get; set; } // uniqueidentifier
-		[PrimaryKey(2), NotNull] public string Jid       { get; set; } // nvarchar(300)
+		[PrimaryKey(0), NotNull] public Guid   ProfileId { get; set; } // uniqueidentifier
+		[PrimaryKey(1), NotNull] public string Jid       { get; set; } // nvarchar(300)
 
 		#region Associations
 
 		/// <summary>
-		/// FK_ProfileJid_Profile
+		/// FK_ProfileJid_0_0
 		/// </summary>
-		[Association(ThisKey="ProfileId", OtherKey="Id", CanBeNull=false, Relationship=Relationship.ManyToOne, KeyName="FK_ProfileJid_Profile", BackReferenceName="ProfileJids")]
+		[Association(ThisKey="ProfileId", OtherKey="Id", CanBeNull=false, Relationship=Relationship.ManyToOne, KeyName="FK_ProfileJid_0_0", BackReferenceName="ProfileJids")]
 		public Profile Profile { get; set; }
 
 		#endregion
 	}
 
-	[Table(Schema="dbo", Name="ProfileName")]
+	[Table("ProfileName")]
 	public partial class ProfileName
 	{
-		[PrimaryKey(1), NotNull] public Guid   ProfileId { get; set; } // uniqueidentifier
-		[PrimaryKey(2), NotNull] public string Name      { get; set; } // nvarchar(300)
+		[PrimaryKey(0), NotNull] public Guid   ProfileId { get; set; } // uniqueidentifier
+		[PrimaryKey(1), NotNull] public string Name      { get; set; } // nvarchar(300)
 
 		#region Associations
 
 		/// <summary>
-		/// FK_ProfileName_Profile
+		/// FK_ProfileName_0_0
 		/// </summary>
-		[Association(ThisKey="ProfileId", OtherKey="Id", CanBeNull=false, Relationship=Relationship.ManyToOne, KeyName="FK_ProfileName_Profile", BackReferenceName="ProfileNames")]
+		[Association(ThisKey="ProfileId", OtherKey="Id", CanBeNull=false, Relationship=Relationship.ManyToOne, KeyName="FK_ProfileName_0_0", BackReferenceName="ProfileNames")]
 		public Profile Profile { get; set; }
-
-		#endregion
-	}
-
-	public static partial class SqlFunctions
-	{
-		#region FnDiagramobjects
-
-		[Sql.Function(Name="dbo.fn_diagramobjects", ServerSideOnly=true)]
-		public static int? FnDiagramobjects()
-		{
-			throw new InvalidOperationException();
-		}
 
 		#endregion
 	}

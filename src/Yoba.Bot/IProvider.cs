@@ -11,7 +11,7 @@ namespace Yoba.Bot
     public interface IProvider<TMsg, TProp> : IProvider<TMsg>
     {
         Task<TProp> Provide(TMsg message,
-            TProp defaultValue = default(TProp),
-            CancellationToken cancellation = default(CancellationToken));
+            TProp defaultValue = default,
+            CancellationToken cancellation = default);
     }
 }

@@ -6,8 +6,8 @@ namespace Yoba.Bot.Telegram
 {
     public class TelegramTextProvider : IProvider<Message, string>
     {
-        public Task<string> Provide(Message message, string defaultValue = default(string),
-            CancellationToken cancellation = default(CancellationToken))
+        public Task<string> Provide(Message message, string defaultValue = default,
+            CancellationToken cancellation = default)
         {
             return Task.FromResult(message.Text);
         }

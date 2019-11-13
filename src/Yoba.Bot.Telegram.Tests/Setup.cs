@@ -3,10 +3,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
+using Yoba.Bot.Db;
+using Yoba.Bot.DbUp;
+using Yoba.Bot.Entities;
 using Yoba.Bot.Telegram;
 
 namespace Yoba.Bot.Tests
@@ -18,6 +22,8 @@ namespace Yoba.Bot.Tests
 
         public static T GetService<T>() => ServiceProvider.Value.GetService<T>();
 
+        public static IServiceScope GetScope() => ServiceProvider.Value.CreateScope();
+        
         public static Request<Message> Message(string txt) =>
             new Request<Message>(new Message
             {
@@ -28,11 +34,26 @@ namespace Yoba.Bot.Tests
         static IServiceProvider Configure()
         {
             var sc = new ServiceCollection();
+            sc.AddSingleton(CreateLoggerFactory());
             sc.AddSingleton<IProvider<Message>, TelegramTextProvider>();
-            sc.AddSingleton(_ => CreateTelegramBotClient());
+            sc.AddSingleton(CreateTelegramBotClient());
             sc.AddSingleton(CreateRandomGenerator(1));
             sc.AddSingleton<SimpleCommandController>();
+
+            sc.AddScoped(_ => CreateUpgraderOptions());
+            sc.AddScoped<IYobaDbFactory, SetupYobaDbFactory>();
+            sc.AddScoped<IProfileDao, ProfileDao>();
+            sc.AddScoped<INoteDao, NoteDao>();
             return sc.BuildServiceProvider();
+        }
+
+        static ILoggerFactory CreateLoggerFactory() =>
+            LoggerFactory.Create(f => f.AddConsole());
+
+        static UpgraderOptions CreateUpgraderOptions()
+        {
+            var conStr = $"Data Source={Guid.NewGuid()}, Mode=memory;";
+            return new UpgraderOptions {ConnectionString = conStr, AutoCreateDb = true,};
         }
 
         static IRandomGenerator CreateRandomGenerator(int returnNum)
