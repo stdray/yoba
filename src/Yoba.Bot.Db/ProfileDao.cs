@@ -28,7 +28,8 @@ namespace Yoba.Bot.Db
                     Zashkvory = p.Zashkvory,
                     CanVote = p.CanVote,
                     MainName = p.MainName,
-                }, token: cancel);
+                    IsTransport = false,
+                }, cancel);
         }
 
         public Task AddAlias(Guid profileId, string name, CancellationToken cancel = default)
@@ -73,17 +74,7 @@ namespace Yoba.Bot.Db
             CancellationToken cancel = default)
         {
             using (var db = _factory.Create())
-                return await db.Profiles
-                    .Select(p => new YobaProfile
-                    {
-                        Id = p.Id,
-                        Loisy = p.Loisy,
-                        Slivi = p.Slivi,
-                        Zashkvory = p.Zashkvory,
-                        CanVote = p.CanVote,
-                        MainName = p.MainName,
-                    })
-                    .ToListAsync(cancel);
+                return await YobaProfiles(db).ToListAsync(cancel);
         }
 
         public async Task<YobaProfile> FindProfile(string name, CancellationToken cancel = default)
@@ -149,23 +140,26 @@ namespace Yoba.Bot.Db
         }
 
 
-        public Task SetProfileAttribute(YobaProfileAttribute attribute,
+        public async Task SetProfileAttribute(YobaProfileAttribute attribute,
             CancellationToken cancel = default)
         {
-            var profileAttribute = new ProfileAttribute
-            {
-                Value = attribute.Value,
-                AttributeId = attribute.Attribute.Id,
-                ProfileId = attribute.ProfileId,
-            };
             using (var db = _factory.Create())
-                return db.ProfileAttributes
-                    .Merge()
-                    .Using(new[] {profileAttribute})
-                    .OnTargetKey()
-                    .InsertWhenNotMatched()
-                    .UpdateWhenMatched()
-                    .MergeAsync(cancel);
+            {
+                var count = await db.ProfileAttributes
+                    .Where(x => x.ProfileId == attribute.ProfileId && x.AttributeId == attribute.Attribute.Id)
+                    .Set(x => x.Value, _ => attribute.Value)
+                    .UpdateAsync(cancel);
+                if (count == 1)
+                    return;
+                if (count > 1)
+                    throw new InvalidOperationException("Conflict");
+                await db.ProfileAttributes.InsertAsync(() => new ProfileAttribute
+                {
+                    Value = attribute.Value,
+                    AttributeId = attribute.Attribute.Id,
+                    ProfileId = attribute.ProfileId,
+                }, cancel);
+            }
         }
 
         public async Task<YobaAttribute> FindAttribute(string name,
@@ -176,6 +170,17 @@ namespace Yoba.Bot.Db
                     .Where(x => x.Name == name)
                     .SingleOrDefaultAsync(cancel);
         }
+
+        static IQueryable<YobaProfile> YobaProfiles(YobaDb db) =>
+            db.Profiles.Select(x => new YobaProfile
+            {
+                Id = x.Id,
+                Loisy = x.Loisy,
+                Slivi = x.Slivi,
+                Zashkvory = x.Zashkvory,
+                CanVote = x.CanVote,
+                MainName = x.MainName
+            });
 
         public async Task<IReadOnlyCollection<YobaAttribute>> GetAttributes(
             CancellationToken cancel = default)

@@ -9,31 +9,17 @@ using Yoba.Bot.Entities;
 
 namespace Yoba.Bot.Tests
 {
-    
-    public class ProfileRepositoryTests : IDisposable
+    public class ProfileRepositoryTests : IClassFixture<ProfileRepositoryFixture>
     {
-        readonly IServiceScope _scope;
         readonly IProfileDao _dao;
+        readonly YobaAttribute _attribute;
+        readonly YobaProfile _profile;
 
-        readonly YobaProfile _profile = MakeProfile(id => new YobaProfile
+        public ProfileRepositoryTests(ProfileRepositoryFixture fixture)
         {
-            Id = id,
-            MainName = $"User {id}",
-            Slivi = 5,
-            Loisy = 7,
-            Zashkvory = 2
-        });
-
-        readonly YobaAttribute _attribute = new YobaAttribute
-        {
-            Id = Guid.NewGuid(),
-            Name = "bar"
-        };
-
-        public ProfileRepositoryTests()
-        {
-            _scope = Setup.GetScope();
-            _dao = _scope.ServiceProvider.GetService<IProfileDao>();
+            _dao = fixture.Scope.ServiceProvider.GetService<IProfileDao>();
+            _attribute = fixture.Attribute;
+            _profile = fixture.Profile;
         }
 
         [Fact, Order(1)]
@@ -41,7 +27,7 @@ namespace Yoba.Bot.Tests
         {
             await _dao.CreateAttribute(_attribute);
             var dst = await _dao.FindAttribute(_attribute.Name);
-            dst.Id.Should().Be(_profile.Id);
+            dst.Id.Should().Be(_attribute.Id);
         }
 
         [Fact, Order(1)]
@@ -94,16 +80,12 @@ namespace Yoba.Bot.Tests
         [Fact, Order(3)]
         public async Task AllProfiles_ShouldBeReturned()
         {
-            await _dao.CreateProfile(MakeProfile(id => new YobaProfile
-            {
-                Id = id,
-                MainName = id.ToString()
-            }));
+            await _dao.CreateProfile(new YobaProfile {Id = Guid.NewGuid(), MainName = "kekek"});
             var profiles = await _dao.GetProfiles();
             profiles.Count.Should().Be(2);
             profiles.Any(x => x.Id == _profile.Id).Should().Be(true);
         }
-        
+
         [Fact, Order(3)]
         public async Task AllAttributes_ShouldBeReturned()
         {
@@ -116,7 +98,7 @@ namespace Yoba.Bot.Tests
             attributes.Count.Should().Be(2);
             attributes.Any(x => x.Id == _attribute.Id).Should().Be(true);
         }
-        
+
         [Fact, Order(4)]
         public async Task ProfileAttribute_ShouldBeCreatedAndListed()
         {
@@ -132,15 +114,6 @@ namespace Yoba.Bot.Tests
             var profileAttributes = await _dao.GetProfileAttributes(_attribute.Name);
             profileAttributes.Count.Should().Be(1);
             profileAttributes.Single().Value.Should().Be(profileAttribute.Value);
-        }
-        
-
-        static YobaProfile MakeProfile(Func<Guid, YobaProfile> ctor) =>
-            ctor(Guid.NewGuid());
-
-        public void Dispose()
-        {
-            _scope?.Dispose();
         }
     }
 }
