@@ -3,7 +3,7 @@ using Yoba.Bot.Entities;
 
 namespace Yoba.Bot.Tests
 {
-    public class ProfileRepositoryFixture : ServiceScopeFixture
+    public class ProfileFixture : ServiceScopeFixture
     {
         public YobaProfile Profile { get; } = MakeProfile(id => new YobaProfile
         {

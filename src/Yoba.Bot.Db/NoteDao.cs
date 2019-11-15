@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -38,13 +39,29 @@ namespace Yoba.Bot.Db
         }
 
 
-        public Task UpdateNote(YobaNote note, CancellationToken cancel = default)
+        public async Task AddOrUpdateNote(YobaNote note, CancellationToken cancel = default)
         {
+            var now = DateTime.Now;
             using (var db = _factory.Create())
-                return db.Notes
+            {
+                var count = await db.Notes
                     .Where(x => x.NoteName == note.Name)
                     .Set(x => x.Content, _ => note.Content)
+                    .Set(x => x.Updated, _ => now)
                     .UpdateAsync(cancel);
+                if (count == 1)
+                    return;
+                if (count > 1)
+                    throw new InvalidOperationException("Conflict");
+                await db.Notes.InsertAsync(() => new Note
+                {
+                    NoteName = note.Name,
+                    DisplayNoteName = note.DisplayName,
+                    Content = note.Content,
+                    Added = now,
+                    Updated = now,
+                }, cancel);
+            }
         }
 
         static IQueryable<YobaNote> YobaNotes(YobaDb db) =>

@@ -8,7 +8,9 @@ namespace Yoba.Bot.RegularExpressions
         public static Re anyCh { get; } = new Const(".");
         public static Re begin { get; } = new Const("^");
         public static Re end { get; } = new Const("$");
-        public static Re ws { get; } = new Const(@"\s");
+        public static Re s { get; } = new Const(@"\s");
+        public static Re d { get; } = new Const(@"\d");
+        public static Re w { get; } = new Const(@"\w");
         public static Re value(string value) => new Value(value);
         public static Re re(string value) => new Value(value);
         public static Re seq(Re re, params Re[] res) => res.Aggregate(re, (a, x) => a + x);

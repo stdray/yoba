@@ -100,18 +100,8 @@ namespace Yoba.Bot.Db
                     .Where(x => x.ProfileId == profile.Id)
                     .Select(x => x.Name)
                     .ToListAsync(cancel);
-                var attributes = await db.ProfileAttributes
+                var attributes = await YobaProfileAttributes(db)
                     .Where(x => x.ProfileId == profile.Id)
-                    .Select(x => new YobaProfileAttribute
-                    {
-                        Attribute = new YobaAttribute
-                        {
-                            Id = x.AttributeId,
-                            Name = x.Attribute.Attribute_Column,
-                        },
-                        Value = x.Value,
-                        ProfileId = x.ProfileId
-                    })
                     .ToListAsync(cancel);
                 profile.Names = names;
                 profile.Attributes = attributes;
@@ -124,7 +114,7 @@ namespace Yoba.Bot.Db
         {
             using (var db = _factory.Create())
                 return await YobaProfileAttributes(db)
-                    .Where(x => x.Attribute.Name == name)
+                    .Where(x => x.AttributeName == name)
                     .ToListAsync(cancel);
         }
 
@@ -146,7 +136,7 @@ namespace Yoba.Bot.Db
             using (var db = _factory.Create())
             {
                 var count = await db.ProfileAttributes
-                    .Where(x => x.ProfileId == attribute.ProfileId && x.AttributeId == attribute.Attribute.Id)
+                    .Where(x => x.ProfileId == attribute.ProfileId && x.AttributeId == attribute.AttributeId)
                     .Set(x => x.Value, _ => attribute.Value)
                     .UpdateAsync(cancel);
                 if (count == 1)
@@ -156,7 +146,7 @@ namespace Yoba.Bot.Db
                 await db.ProfileAttributes.InsertAsync(() => new ProfileAttribute
                 {
                     Value = attribute.Value,
-                    AttributeId = attribute.Attribute.Id,
+                    AttributeId = attribute.AttributeId,
                     ProfileId = attribute.ProfileId,
                 }, cancel);
             }
@@ -201,13 +191,11 @@ namespace Yoba.Bot.Db
             db.ProfileAttributes
                 .Select(x => new YobaProfileAttribute
                 {
-                    Attribute = new YobaAttribute
-                    {
-                        Id = x.AttributeId,
-                        Name = x.Attribute.Attribute_Column,
-                    },
                     Value = x.Value,
-                    ProfileId = x.ProfileId
+                    ProfileId = x.ProfileId,
+                    AttributeId = x.AttributeId,
+                    AttributeName = x.Attribute.Attribute_Column,
+                    ProfileName = x.Profile.MainName
                 });
     }
 }

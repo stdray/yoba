@@ -15,12 +15,12 @@ using static Yoba.Bot.RegularExpressions.Dsl;
 
 namespace Yoba.Bot.Telegram
 {
-    public class SimpleCommandController : Controller<Message>
+    public class SimpleController : Controller<Message>
     {
         readonly ITelegramBotClient _telegram;
         readonly IRandomGenerator _random;
 
-        public SimpleCommandController(IEnumerable<IProvider<Message>> providers, ITelegramBotClient telegram,
+        public SimpleController(IEnumerable<IProvider<Message>> providers, ITelegramBotClient telegram,
             IRandomGenerator random) : base(providers)
         {
             _telegram = telegram;
@@ -44,10 +44,10 @@ namespace Yoba.Bot.Telegram
         {
             const string name = "answers";
             Re phrase(string n) => anyCh.weakAny.group(n);
-            var sp = ws + "или" + ws | ",";
+            var sp = s + "или" + s | ",";
             var vanga = anyOf("вангуй", "гадай");
             var question = phrase(string.Empty);
-            var answers = ws.opt + phrase(name) + (sp + phrase(name)).oneOrMore;
+            var answers = s.opt + phrase(name) + (sp + phrase(name)).oneOrMore;
 
             async Task<Result> Reply(Request<Message> request, Match match, CancellationToken cancel)
             {
@@ -62,9 +62,9 @@ namespace Yoba.Bot.Telegram
                 return Ok(await _telegram.ReplyAsync(request, choice, cancel));
             }
 
-            this.AddReRule(bot + vanga + ws + question + ws.opt + ":" + answers + "?".opt(), Reply);
-            this.AddReRule(bot + vanga + ws + answers + "?".opt(), Reply);
-            this.AddReRule(bot + vanga + ws + question + "?".opt(), Reply);
+            this.AddReRule(bot + vanga + s + question + s.opt + ":" + answers + "?".opt(), Reply);
+            this.AddReRule(bot + vanga + s + answers + "?".opt(), Reply);
+            this.AddReRule(bot + vanga + s + question + "?".opt(), Reply);
         }
 
         void Version() => this.AddReRule(

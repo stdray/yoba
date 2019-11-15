@@ -8,10 +8,13 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
+using Xunit;
 using Yoba.Bot.Db;
 using Yoba.Bot.DbUp;
 using Yoba.Bot.Entities;
 using Yoba.Bot.Telegram;
+
+[assembly: TestCaseOrderer("Xunit.Extensions.Ordering.TestCaseOrderer", "Xunit.Extensions.Ordering")]
 
 namespace Yoba.Bot.Tests
 {
@@ -38,7 +41,7 @@ namespace Yoba.Bot.Tests
             sc.AddSingleton<IProvider<Message>, TelegramTextProvider>();
             sc.AddSingleton(CreateTelegramBotClient());
             sc.AddSingleton(CreateRandomGenerator(1));
-            sc.AddSingleton<SimpleCommandController>();
+            sc.AddSingleton<SimpleController>();
 
             sc.AddScoped(_ => CreateUpgraderOptions());
             sc.AddScoped<IYobaDbFactory, SetupYobaDbFactory>();

@@ -9,13 +9,13 @@ using Yoba.Bot.Entities;
 
 namespace Yoba.Bot.Tests
 {
-    public class ProfileRepositoryTests : IClassFixture<ProfileRepositoryFixture>
+    public class ProfileDaoTests : IClassFixture<ProfileFixture>
     {
         readonly IProfileDao _dao;
         readonly YobaAttribute _attribute;
         readonly YobaProfile _profile;
 
-        public ProfileRepositoryTests(ProfileRepositoryFixture fixture)
+        public ProfileDaoTests(ProfileFixture fixture)
         {
             _dao = fixture.Scope.ServiceProvider.GetService<IProfileDao>();
             _attribute = fixture.Attribute;
@@ -104,9 +104,11 @@ namespace Yoba.Bot.Tests
         {
             var profileAttribute = new YobaProfileAttribute
             {
-                Attribute = _attribute,
+                AttributeId = _attribute.Id,
+                AttributeName = _attribute.Name,
                 Value = "peka",
                 ProfileId = _profile.Id,
+                ProfileName = _profile.MainName,
             };
             await _dao.SetProfileAttribute(profileAttribute);
             var dst = await _dao.FindProfile(_profile.MainName);

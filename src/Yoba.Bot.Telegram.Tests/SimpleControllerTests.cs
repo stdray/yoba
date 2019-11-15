@@ -8,15 +8,15 @@ using Yoba.Bot.Telegram;
 
 namespace Yoba.Bot.Tests
 {
-    public class SimpleCommandControllerTests
+    public class SimpleControllerTests
     {
         readonly ITestOutputHelper _output;
-        readonly SimpleCommandController _controller;
+        readonly SimpleController _controller;
 
-        public SimpleCommandControllerTests(ITestOutputHelper output)
+        public SimpleControllerTests(ITestOutputHelper output)
         {
             _output = output;
-            _controller = Setup.GetService<SimpleCommandController>();
+            _controller = Setup.GetService<SimpleController>();
         }
 
 
