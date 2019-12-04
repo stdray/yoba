@@ -1,4 +1,7 @@
+using System;
+using System.Diagnostics;
 using LinqToDB;
+using LinqToDB.Data;
 
 namespace Yoba.Bot.Db
 {
@@ -10,6 +13,10 @@ namespace Yoba.Bot.Db
         {
             ConnectionString = connectionString;
             _provider = provider;
+            
+            DataConnection.TurnTraceSwitchOn();
+            DataConnection.TurnTraceSwitchOn();
+            DataConnection.WriteTraceLine = (x, y) => Console.WriteLine("{0}{1}", x, y);
         }
 
         public string ConnectionString { get; }

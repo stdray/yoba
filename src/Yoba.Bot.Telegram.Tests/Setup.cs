@@ -57,7 +57,10 @@ namespace Yoba.Bot.Tests
         }
 
         static ILoggerFactory CreateLoggerFactory() =>
-            LoggerFactory.Create(f => f.AddConsole());
+            LoggerFactory.Create(f =>
+            {
+                f.AddConsole();
+            });
 
         static UpgraderOptions CreateUpgraderOptions()
         {

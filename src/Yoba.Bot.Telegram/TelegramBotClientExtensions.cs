@@ -13,7 +13,6 @@ namespace Yoba.Bot.Telegram
             msg.Message.Chat.Id,
             text,
             replyToMessageId: msg.Message.MessageId,
-            replyMarkup: new ForceReplyMarkup(),
             cancellationToken: cancel);
     }
 }
