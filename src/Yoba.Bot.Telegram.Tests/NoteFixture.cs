@@ -1,5 +1,4 @@
 using System;
-using Yoba.Bot.Db;
 using Yoba.Bot.Entities;
 
 namespace Yoba.Bot.Tests

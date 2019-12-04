@@ -39,6 +39,5 @@ namespace Yoba.Bot.Tests
             var res2 = (Result<Message>) res1;
             res2.Response.Text.Should().Be(expected);
         }
-      
     }
 }

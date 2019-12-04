@@ -14,7 +14,7 @@ namespace Yoba.Bot
             IEnumerable<IMiddleware<TMsg>> middlewares = null)
         {
             _handlers = handlers;
-            _middlewares = _middlewares ?? new List<IMiddleware<TMsg>>();
+            _middlewares ??= new List<IMiddleware<TMsg>>();
         }
 
         public async Task<Result> Handle(Request<TMsg> request, CancellationToken cancel)
@@ -27,7 +27,7 @@ namespace Yoba.Bot
             foreach (var handler in _handlers)
             {
                 result = await handler.Handle(request, cancel);
-                if ((result.Status & Status.Success) != 0)
+                if ((result.Status & Status.Success) == Status.Success)
                     break;
             }
             return result;

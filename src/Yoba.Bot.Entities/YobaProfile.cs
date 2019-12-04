@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Yoba.Bot.Entities
 {
-    public class YobaProfile
+    public class YobaProfile 
     {
         public Guid Id { get; set; }
         public string MainName { get; set; }

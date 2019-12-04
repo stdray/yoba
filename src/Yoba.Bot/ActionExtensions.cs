@@ -16,9 +16,16 @@ namespace Yoba.Bot
             controller.Add(new RegexAction<TMsg>(prov, regex, handle));
         }
 
-        public static void AddReRule<TMsg>(this Controller<TMsg> controller, Re re, MatchHandle<TMsg> handle) =>
-            AddRegexRule(controller, new Regex((begin + re + end).ToString()), handle);
-        
+        public static void AddReRule<TMsg>(this Controller<TMsg> controller, Re re, MatchHandle<TMsg> handle,
+            ReRuleOptions options = null)
+        {
+            options ??= new ReRuleOptions();
+            if (options.ImplicitBeginEnd)
+                re = begin + re + end;
+            var regex = new Regex(re.ToString(), options.RegexOptions);
+            AddRegexRule(controller, regex, handle);
+        }
+
 
         public static void AddSimpleRule<TMsg>(this Controller<TMsg> controller, SimpleHandle<TMsg> handle)
         {

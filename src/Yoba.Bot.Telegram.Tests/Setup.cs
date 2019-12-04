@@ -27,11 +27,15 @@ namespace Yoba.Bot.Tests
 
         public static IServiceScope GetScope() => ServiceProvider.Value.CreateScope();
         
-        public static Request<Message> Message(string txt) =>
+        public static Request<Message> Message(string txt, string username = null) =>
             new Request<Message>(new Message
             {
                 Text = txt,
-                Chat = new Chat {Id = 1488}
+                Chat = new Chat {Id = 1488},
+                From = new User
+                {
+                    Username = username
+                }
             });
 
         static IServiceProvider Configure()
@@ -47,6 +51,8 @@ namespace Yoba.Bot.Tests
             sc.AddScoped<IYobaDbFactory, SetupYobaDbFactory>();
             sc.AddScoped<IProfileDao, ProfileDao>();
             sc.AddScoped<INoteDao, NoteDao>();
+            sc.AddScoped<ProfileController>();
+            sc.AddScoped<NoteController>();
             return sc.BuildServiceProvider();
         }
 

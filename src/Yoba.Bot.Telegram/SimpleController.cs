@@ -32,22 +32,25 @@ namespace Yoba.Bot.Telegram
             Translit();
         }
 
-        void Translit() => this.AddReRule(
-            bot + anyOf("транслитом", "translit") + anyCh.oneOrMore.group("text"),
-            async (request, match, cancel) =>
-            {
-                var text = match.Values("text").Single();
-                return Ok(await _telegram.ReplyAsync(request, text.Unidecode(), cancel));
-            });
+        void Translit()
+        {
+            var translit = anyOf("транслитом", "translit");
+            this.AddReRule(
+                bot + s + translit + s + phrase("text"),
+                async (request, match, cancel) =>
+                {
+                    var text = match.Values("text").Single();
+                    return Ok(await _telegram.ReplyAsync(request, text.Unidecode(), cancel));
+                });
+        }
 
         void Vanga()
         {
             const string name = "answers";
-            Re phrase(string n) => anyCh.weakAny.group(n);
             var sp = s + "или" + s | ",";
             var vanga = anyOf("вангуй", "гадай");
-            var question = phrase(string.Empty);
-            var answers = s.opt + phrase(name) + (sp + phrase(name)).oneOrMore;
+            var question = phrase("question");
+            var answers = phrase(name) + (sp + phrase(name)).oneOrMore;
 
             async Task<Result> Reply(Request<Message> request, Match match, CancellationToken cancel)
             {
@@ -62,13 +65,13 @@ namespace Yoba.Bot.Telegram
                 return Ok(await _telegram.ReplyAsync(request, choice, cancel));
             }
 
-            this.AddReRule(bot + vanga + s + question + s.opt + ":" + answers + "?".opt(), Reply);
-            this.AddReRule(bot + vanga + s + answers + "?".opt(), Reply);
-            this.AddReRule(bot + vanga + s + question + "?".opt(), Reply);
+            this.AddReRule(bot + s + vanga + s + question + space.any + ":" + answers + "?".opt(), Reply);
+            this.AddReRule(bot + s + vanga + s + answers + "?".opt(), Reply);
+            this.AddReRule(bot + s + vanga + s + question + "?".opt(), Reply);
         }
 
         void Version() => this.AddReRule(
-            bot + anyOf("версия", "version"),
+            bot + s+ anyOf("версия", "version"),
             async (request, _, cancel) =>
             {
                 var text = Assembly.GetExecutingAssembly().GetName().Version.ToString();

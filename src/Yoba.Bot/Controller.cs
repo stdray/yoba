@@ -17,7 +17,7 @@ namespace Yoba.Bot
 
         public void Add(IHandler<TMsg> action) => _actions.Add(action);
 
-        public async Task<Result> Handle(Request<TMsg> request, CancellationToken cancel)
+        public async Task<Result> Handle(Request<TMsg> request, CancellationToken cancel = default(CancellationToken))
         {
             var result = Result.Skip();
             foreach (var handler in _actions)

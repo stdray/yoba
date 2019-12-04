@@ -8,12 +8,13 @@ namespace Yoba.Bot.Tests
         public YobaProfile Profile { get; } = MakeProfile(id => new YobaProfile
         {
             Id = id,
-            MainName = $"User {id}",
+            MainName = $"User_{id}",
             Slivi = 5,
             Loisy = 7,
-            Zashkvory = 2
+            Zashkvory = 2,
+            CanVote = true
         });
-
+        
         public YobaAttribute Attribute { get; } = new YobaAttribute
         {
             Id = Guid.NewGuid(),
