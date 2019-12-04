@@ -9,10 +9,7 @@ namespace Yoba.Bot.Telegram
         public Task<string> Provide(Message message, string defaultValue = default,
             CancellationToken cancellation = default)
         {
-            var text = message.ForwardFrom != null || message.ForwardFromChat != null || message.From.IsBot
-                ? defaultValue
-                : message.Text;
-            return Task.FromResult(text);
+            return Task.FromResult(message.Text);
         }
     }
 }

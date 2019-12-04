@@ -63,7 +63,10 @@ namespace Yoba.Bot.Telegram
                 async (request, match, cancel) =>
                 {
                     var to = await _dao.FindProfile(match.Value("name"), cancel);
-                    await _dao.AddAlias(to.Id, match.Value("alias"), cancel);
+                    if(to == null)
+                        return Ok(await _telegram.ReplyAsync(request, "Профиль не найден", cancel));
+                    var name = match.Value("alias").Trim();
+                    await _dao.AddAlias(to.Id, name, cancel);
                     return Ok(await _telegram.ReplyAsync(request, "Ок", cancel));
                 });
         }
@@ -177,7 +180,11 @@ namespace Yoba.Bot.Telegram
                 async (request, match, cancel) =>
                 {
                     var attr = await _dao.FindAttribute(match.Value("attr"), cancel);
+                    if(attr == null)
+                        return Ok(await _telegram.ReplyAsync(request, "Атрибут не найден", cancel));
                     var prof = await _dao.FindProfile(match.Value("name"), cancel);
+                    if(prof == null)
+                        return Ok(await _telegram.ReplyAsync(request, "Профиль не найден", cancel));
                     await _dao.SetProfileAttribute(new YobaProfileAttribute
                     {
                         Value = match.Value("data"),

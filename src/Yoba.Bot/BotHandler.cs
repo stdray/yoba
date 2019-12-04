@@ -4,16 +4,14 @@ using System.Threading.Tasks;
 
 namespace Yoba.Bot
 {
-    public abstract class RequestPipe<TMsg>
+    public class BotHandler<TMsg> : IHandler<TMsg>
     {
         readonly IEnumerable<IMiddleware<TMsg>> _middlewares;
-        readonly IEnumerable<IHandler<TMsg>> _handlers;
+        readonly IEnumerable<IController<TMsg>> _controllers;
 
-        protected RequestPipe(
-            IEnumerable<IHandler<TMsg>> handlers,
-            IEnumerable<IMiddleware<TMsg>> middlewares = null)
+        public BotHandler(IEnumerable<IController<TMsg>> controllers, IEnumerable<IMiddleware<TMsg>> middlewares = null)
         {
-            _handlers = handlers;
+            _controllers = controllers;
             _middlewares ??= new List<IMiddleware<TMsg>>();
         }
 
@@ -24,12 +22,16 @@ namespace Yoba.Bot
             {
                 await middleware.Execute(request, cancel);
             }
-            foreach (var handler in _handlers)
+
+            foreach (var handler in _controllers)
             {
                 result = await handler.Handle(request, cancel);
                 if ((result.Status & Status.Success) == Status.Success)
+                {
                     break;
+                }
             }
+
             return result;
         }
     }
