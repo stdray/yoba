@@ -28,6 +28,8 @@ namespace Yoba.Bot.Tests
             {
                 await _dao.AddOrUpdateNote(_note);
                 var dst = await _dao.FindNote(_note.Name);
+                var notes = await _dao.GetNotes();
+                Console.WriteLine(notes);
                 dst.Content.Should().Be(_note.Content);
                 dst.Name.Should().Be(_note.Name);
                 dst.DisplayName.Should().Be(_note.DisplayName);

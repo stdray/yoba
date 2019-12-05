@@ -36,7 +36,7 @@ namespace Yoba.Bot.Telegram
                 {
                     var data = match.Value("data");
                     var displayName = match.Value("name").Trim();
-                    var name = MakePkNoteName(displayName);
+                    var name = YobaNote.MakePkName(displayName);
                     var note = await _dao.FindNote(name, cancel);
                     if (note == null)
                     {
@@ -44,7 +44,6 @@ namespace Yoba.Bot.Telegram
                         {
                             Content = data,
                             Created = DateTime.Now,
-                            Name = name,
                             DisplayName = displayName
                         };
                     }
@@ -71,7 +70,7 @@ namespace Yoba.Bot.Telegram
                 bot + s + "покажи" + s + "заметку" + phrase("name"),
                 async (request, match, cancel) =>
                 {
-                    var name = MakePkNoteName(match.Value("name"));
+                    var name = YobaNote.MakePkName(match.Value("name"));
                     var note = await _dao.FindNote(name, cancel);
                     if (note == null)
                         return Ok(await _telegram.ReplyAsync(request, "Заметка не найдена", cancel));
@@ -103,7 +102,7 @@ namespace Yoba.Bot.Telegram
                 async (request, match, cancel) =>
                 {
                     var line = int.Parse(match.Value("line"));
-                    var name = MakePkNoteName(match.Value("name"));
+                    var name = YobaNote.MakePkName(match.Value("name"));
                     var note = await _dao.FindNote(name, cancel);
                     if (note == null)
                         return Ok(await _telegram.ReplyAsync(request, "Заметка не найдена", cancel));
@@ -125,9 +124,6 @@ namespace Yoba.Bot.Telegram
                 await _dao.AddOrUpdateNote(note, cancel);
         }
 
-        static string MakePkNoteName(string name) => 
-            name.Trim().ToLower().Replace(" ", "");
-        
         static IEnumerable<string> Lines(string str) => str
             .Split(new[] {'\n'}, StringSplitOptions.RemoveEmptyEntries)
             .Select(x => x.Trim())

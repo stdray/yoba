@@ -28,24 +28,24 @@ namespace Yoba.Bot.Tests
             //AddOrUpdateNote
             {
                 //Create new note from line
-                await Handle($"ёба добавь в заметку {_note.Name} : {_note.Content}");
+                await Handle($"ёба добавь в заметку {_note.DisplayName} : {_note.Content}");
                 var note = await _dao.FindNote(_note.Name);
                 note.Content.Should().Be(_note.Content);
                 //Append line to note
                 var line = Guid.NewGuid().ToString();
-                await Handle($"ёба добавь в заметку {_note.Name} : {line}");
+                await Handle($"ёба добавь в заметку {_note.DisplayName} : {line}");
                 note = await _dao.FindNote(_note.Name);
                 _note.Content.Should().ContainAll(_note.Content.Split(Environment.NewLine));
                 note.Content.Should().Contain(line);
                 //Reset note to original content
-                await Handle($"ёба обнови заметку {_note.Name} : {_note.Content}");
+                await Handle($"ёба обнови заметку {_note.DisplayName} : {_note.Content}");
                 note = await _dao.FindNote(_note.Name);
                 note.Content.Should().Be(_note.Content);
             }
             
             //ShowNote
             {
-                var result = await Handle($"ёба покажи заметку {_note.Name}");
+                var result = await Handle($"ёба покажи заметку {_note.DisplayName}");
                 result.Response.Text.Should().ContainAll(_note.Content.Split(Environment.NewLine));
             }
 
@@ -53,7 +53,6 @@ namespace Yoba.Bot.Tests
             {
                 Content = "aaaaa" + Environment.NewLine + "bbb",
                 DisplayName = "baz",
-                Name = "baz",
                 Created = DateTime.Now,
                 Updated = DateTime.Now
             };
@@ -62,17 +61,17 @@ namespace Yoba.Bot.Tests
             //ListNotes
             {
                 var result = await Handle($"ёба покажи список заметок");
-                result.Response.Text.Should().ContainAll(_note.Name, note2.DisplayName);
+                result.Response.Text.Should().Contain( note2.DisplayName);
             }
             
             //DelNoteLine
             {
-                await Handle($"ёба удали 1 из {note2.Name}");
+                await Handle($"ёба удали 1 из {note2.DisplayName}");
                 var tmp = await _dao.FindNote(note2.Name);
                 tmp.Content.Should().Contain("bbb");
                 tmp.Content.Should().NotContain("aaaaa");
                 //Empty note should be deleted
-                await Handle($"ёба удали 1 из {note2.Name}");
+                await Handle($"ёба удали 1 из {note2.DisplayName}");
                 tmp = await _dao.FindNote(note2.Name);
                 tmp.Should().BeNull();
             }

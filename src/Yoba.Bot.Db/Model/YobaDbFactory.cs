@@ -9,7 +9,7 @@ namespace Yoba.Bot.Db
     {
         readonly string _provider;
 
-        public YobaDbFactory(string connectionString, string provider = ProviderName.SQLite)
+        public YobaDbFactory(string connectionString, string provider = ProviderName.SQLiteClassic)
         {
             ConnectionString = connectionString;
             _provider = provider;

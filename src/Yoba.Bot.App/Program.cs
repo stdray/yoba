@@ -20,12 +20,17 @@ namespace Yoba.Bot.App
             var builder = CreateHostBuilder(args);
             var host = builder.Build();
             await host.RunAsync();
-            Console.ReadKey();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
+        static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .UseWindowsService()
+                .UseEnvironment(Environments.Development)
+                .ConfigureAppConfiguration((ctx, c) =>
+                {
+                    if (ctx.HostingEnvironment.IsDevelopment())
+                        c.AddUserSecrets<BotServiceConfig>();
+                })
                 .ConfigureServices(ConfigureServices)
                 .ConfigureLogging(x =>
                 {
@@ -36,23 +41,22 @@ namespace Yoba.Bot.App
         static void ConfigureServices(HostBuilderContext host, IServiceCollection sc)
         {
             const string sectionName = "YobaBot";
-            var config = new BotServiceConfig();
-            host.Configuration.GetSection(sectionName).Bind(config);
-
+            var config = host.Configuration.GetSection(sectionName).Get<BotServiceConfig>();
             sc.Configure<BotServiceConfig>(host.Configuration.GetSection(sectionName));
             sc.AddSingleton<IProvider<Message>, TelegramTextProvider>();
             sc.AddSingleton<ITelegramBotClient>(_ => CreateTelegramBotClient(config));
             sc.AddSingleton<IRandomGenerator, ThreadLocalRandom>();
 
             //sc.AddScoped(_ => CreateUpgraderOptions());
-            sc.AddScoped<IYobaDbFactory>(_ => new YobaDbFactory(config.ConnectionString));
-            sc.AddScoped<IProfileDao, ProfileDao>();
-            sc.AddScoped<INoteDao, NoteDao>();
+            sc.AddSingleton<IYobaDbFactory>(_ => new YobaDbFactory(config.ConnectionString));
+            sc.AddSingleton<IProfileDao, ProfileDao>();
+            sc.AddSingleton<INoteDao, NoteDao>();
 
             sc.AddSingleton<IController<Message>, SimpleController>();
-            sc.AddScoped<IController<Message>,ProfileController>();
-            sc.AddScoped<IController<Message>,NoteController>();
-            sc.AddScoped<BotHandler<Message>>();
+            sc.AddSingleton<IController<Message>, ProfileController>();
+            sc.AddSingleton<IController<Message>, NoteController>();
+            sc.AddSingleton<BotHandler<Message>>();
+            
             sc.AddHostedService<BotService>();
         }
 
