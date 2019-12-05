@@ -1,9 +1,9 @@
-<#@ template language="C#" debug="True" hostSpecific="True"                           #>
-<#@ output extension=".generated.cs"                                                  #>
-<#@ include file="$(LinqToDBT4SqlServerTemplatesDirectory)LinqToDB.SqlServer.Tools.ttinclude" #>
-<#@ include file="$(LinqToDBT4SqlServerTemplatesDirectory)PluralizationService.ttinclude"     #>
-<# //@ include file="$(ProjectDir)LinqToDB.Templates\LinqToDB.SqlServer.Tools.ttinclude" #>
-<# //@ include file="$(ProjectDir)LinqToDB.Templates\PluralizationService.ttinclude"     #>
+<#@ template language="C#" debug="True" hostSpecific="True"                        #>
+<#@ output extension=".generated.cs"                                               #>
+<#@ include file="$(LinqToDBT4SQLiteTemplatesDirectory)LinqToDB.SQLite.Tools.ttinclude" #>
+<#@ include file="$(LinqToDBT4SQLiteTemplatesDirectory)PluralizationService.ttinclude"  #>
+<# //@ include file="$(ProjectDir)LinqToDB.Templates\LinqToDB.SQLite.Tools.ttinclude" #>
+<# //@ include file="$(ProjectDir)LinqToDB.Templates\PluralizationService.ttinclude"  #>
 <#
 	/*
 		1. Create new *.tt file (e.g. MyDatabase.tt) in a folder where you would like to generate your data model
@@ -18,8 +18,7 @@
 		3. Add connection string to the web/app.config file:
 
 			<connectionStrings>
-				<add name="MyDatabase" providerName="System.Data.SqlClient"
-					connectionString="Data Source=.;Database=MyDatabase;User Id=User;Password=TestPassword;" />
+				<add name="MyDatabase" connectionString="Data Source=MyDatabase.sqlite" providerName="SQLite" />
 			</connectionStrings>
 
 		4. To access your database use the following code:
@@ -35,22 +34,13 @@
 			}
 
 		5. See more at https://linq2db.github.io/articles/T4.html
-
-		If you need to use the Microsoft.SqlServer.Types namespace, install the Microsoft.SqlServer.Types nuget,
-		and replace the following include at the top of this file:
-
-			"$(ProjectDir)LinqToDB.Templates\LinqToDB.SqlServer.Tools.ttinclude"
-
-		with
-
-			"$(ProjectDir)LinqToDB.Templates\LinqToDB.SqlServer.SqlTypes.Tools.ttinclude"
 	*/
-//	OneToManyAssociationType      = "IEnumerable<{0}>";
+
+	DataContextName = "YobaDb";
 	NamespaceName = "Yoba.Bot.Db";
 
-//	LoadSqlServerMetadata("MyServer", "MyDatabase", "User", "Password");
-	LoadSqlServerMetadata("(LocalDb)\\MSSQLLocalDB", "YobaBot"); // Integrated Security
-//	LoadSqlServerMetadata(string connectionString);
+	LoadSQLiteMetadata(@"C:\tmp", "YobaDB.sqlite3");
+//	LoadSQLiteMetadata(string connectionString);
 
 	GenerateModel();
 #>

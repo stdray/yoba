@@ -1,12 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="linq2db" Version="2.9.3" />
-    <PackageReference Include="linq2db.SqlServer" Version="2.9.3" />
+    <PackageReference Include="linq2db.SQLite" Version="2.9.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,6 +28,10 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Db.tt</DependentUpon>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Yoba.Bot.Entities\Yoba.Bot.Entities.csproj" />
   </ItemGroup>
 
 </Project>

@@ -13,7 +13,7 @@ namespace Yoba.Bot
 
         public TMsg Message { get; }
 
-        public TProp GetProperty<TProp>(string key, TProp @default = default(TProp))
+        public TProp GetProperty<TProp>(string key, TProp @default = default)
         {
             return !_properties.TryGetValue(key, out var value) ? @default : (TProp) value;
         }

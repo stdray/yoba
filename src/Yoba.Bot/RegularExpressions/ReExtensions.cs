@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Yoba.Bot.RegularExpressions
@@ -10,6 +11,9 @@ namespace Yoba.Bot.RegularExpressions
 
         public static IEnumerable<string> Values(this Match match, string name) => 
             Clean(match.Groups[name].Captures);
+        
+        public static string Value(this Match match, string name) => 
+            Clean(match.Groups[name].Captures).Single();
 
         public static IEnumerable<string> Clean(CaptureCollection captures)
         {

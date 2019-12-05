@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace Yoba.Bot
-{
+{    
     public class Controller<TMsg> : IController<TMsg>
     {
         public IReadOnlyCollection<IProvider<TMsg>> Providers { get; }
@@ -17,13 +17,13 @@ namespace Yoba.Bot
 
         public void Add(IHandler<TMsg> action) => _actions.Add(action);
 
-        public async Task<Result> Handle(Request<TMsg> request, CancellationToken cancel)
+        public async Task<Result> Handle(Request<TMsg> request, CancellationToken cancel = default(CancellationToken))
         {
             var result = Result.Skip();
             foreach (var handler in _actions)
             {
                 result = await handler.Handle(request, cancel);
-                if ((result.Status & Status.Success) != 0)
+                if (result.Status != Status.None)
                     break;
             }
 

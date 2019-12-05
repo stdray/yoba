@@ -4,7 +4,7 @@ namespace Yoba.Bot.RegularExpressions
     {
         readonly string _raw;
 
-        internal Const(string raw)
+        public Const(string raw)
         {
             _raw = raw;
         }
