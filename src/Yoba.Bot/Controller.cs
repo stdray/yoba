@@ -23,7 +23,7 @@ namespace Yoba.Bot
             foreach (var handler in _actions)
             {
                 result = await handler.Handle(request, cancel);
-                if ((result.Status & Status.Success) != 0)
+                if (result.Status != Status.None)
                     break;
             }
 

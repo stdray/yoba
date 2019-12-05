@@ -60,12 +60,12 @@ namespace Yoba.Bot.Telegram
             var alias = anyOf("алиас", "alias", "псевдоним", "погоняло", "кличку", "позывной");
             this.AddReRule(
                 bot + (s + add).opt + s + alias + s + phrase("alias") + s + "для" + s + phrase("name"),
-                async (request, match, cancel) =>
+                    async (request, match, cancel) =>
                 {
                     var to = await _dao.FindProfile(match.Value("name"), cancel);
                     if(to == null)
                         return Ok(await _telegram.ReplyAsync(request, "Профиль не найден", cancel));
-                    var name = match.Value("alias").Trim();
+                    var name = match.Value("alias").Trim().Trim('@');
                     await _dao.AddAlias(to.Id, name, cancel);
                     return Ok(await _telegram.ReplyAsync(request, "Ок", cancel));
                 });
@@ -148,10 +148,11 @@ namespace Yoba.Bot.Telegram
         void ShowAttributeValues()
         {
             this.AddReRule(
-                bot + s + show + s + attribute + s + name("name"),
+                bot + s + show + s + attribute + s + phrase("name"),
                 async (request, match, cancel) =>
                 {
-                    var values = await _dao.GetProfileAttributes(match.Value("name"), cancel);
+                    var name = match.Value("name").Trim();
+                    var values = await _dao.GetProfileAttributes(name, cancel);
                     var lines = values.Select(a => $"{a.ProfileName}: {a.Value}");
                     var text = string.Join(Environment.NewLine, lines);
                     return Ok(await _telegram.ReplyAsync(request, text, cancel));

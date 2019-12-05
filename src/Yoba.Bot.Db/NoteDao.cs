@@ -70,9 +70,9 @@ namespace Yoba.Bot.Db
                 {
                     Content = x.Content,
                     Created = x.Added,
-                    Name = x.NoteName,
                     Updated = x.Updated,
-                    DisplayName = x.DisplayNoteName
+                    Name = x.NoteName,
+                    DisplayName = x.DisplayNoteName,
                 });
     }
 }

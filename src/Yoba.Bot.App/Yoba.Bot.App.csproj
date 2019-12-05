@@ -1,24 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetFramework>netcoreapp2.0</TargetFramework>
-        <OutputType>Exe</OutputType>
-    </PropertyGroup>
-
-    <ItemGroup>
-      <PackageReference Include="HttpToSocks5Proxy" Version="1.4.0" />
-      <PackageReference Include="Microsoft.Data.Sqlite" Version="3.1.0" />
-      <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Yoba.Bot.Telegram\Yoba.Bot.Telegram.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Update="appsettings.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <UserSecretsId>c209eb7f-2334-4abc-92ce-4eca109d2c47</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="HttpToSocks5Proxy" Version="1.4.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Yoba.Bot.Telegram\Yoba.Bot.Telegram.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
