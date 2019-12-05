@@ -35,7 +35,7 @@ namespace Yoba.Bot.Tests
                 var line = Guid.NewGuid().ToString();
                 await Handle($"ёба добавь в заметку {_note.DisplayName} : {line}");
                 note = await _dao.FindNote(_note.Name);
-                _note.Content.Should().ContainAll(_note.Content.Split(Environment.NewLine));
+                _note.Content.Should().ContainAll(_note.Content.Split('\r','\n'));
                 note.Content.Should().Contain(line);
                 //Reset note to original content
                 await Handle($"ёба обнови заметку {_note.DisplayName} : {_note.Content}");
@@ -46,7 +46,7 @@ namespace Yoba.Bot.Tests
             //ShowNote
             {
                 var result = await Handle($"ёба покажи заметку {_note.DisplayName}");
-                result.Response.Text.Should().ContainAll(_note.Content.Split(Environment.NewLine));
+                result.Response.Text.Should().ContainAll(_note.Content.Split('\r','\n'));
             }
 
             var note2 = new YobaNote

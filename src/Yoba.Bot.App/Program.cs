@@ -27,11 +27,17 @@ namespace Yoba.Bot.App
         static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .UseWindowsService()
-                .UseEnvironment(Environments.Development)
+                .UseEnvironment(Environment.GetEnvironmentVariable("YobaEnv") ?? Environments.Development)
                 .ConfigureAppConfiguration((ctx, c) =>
                 {
                     if (ctx.HostingEnvironment.IsDevelopment())
                         c.AddUserSecrets<BotService.Config>();
+                    else
+                    {
+                        var config = Environment.GetEnvironmentVariable("YobaConfPath");
+                        if (config != null)
+                            c.AddJsonFile(config);
+                    }
                 })
                 .ConfigureServices(ConfigureServices);
 
