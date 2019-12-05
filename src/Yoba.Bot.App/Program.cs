@@ -5,11 +5,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MihaZupan;
+using NLog.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Yoba.Bot.Db;
 using Yoba.Bot.Entities;
 using Yoba.Bot.Telegram;
+using Yoba.Bot.Telegram.Middlewares;
 
 namespace Yoba.Bot.App
 {
@@ -29,26 +31,32 @@ namespace Yoba.Bot.App
                 .ConfigureAppConfiguration((ctx, c) =>
                 {
                     if (ctx.HostingEnvironment.IsDevelopment())
-                        c.AddUserSecrets<BotServiceConfig>();
+                        c.AddUserSecrets<BotService.Config>();
                 })
-                .ConfigureServices(ConfigureServices)
-                .ConfigureLogging(x =>
-                {
-                    x.AddConsole();
-                    x.AddDebug();
-                });
+                .ConfigureServices(ConfigureServices);
 
         static void ConfigureServices(HostBuilderContext host, IServiceCollection sc)
         {
             const string sectionName = "YobaBot";
-            var config = host.Configuration.GetSection(sectionName).Get<BotServiceConfig>();
-            sc.Configure<BotServiceConfig>(host.Configuration.GetSection(sectionName));
+            var serviceConfig = host.Configuration.GetSection(sectionName).Get<BotService.Config>();
+
+            sc.Configure<BotService.Config>(host.Configuration.GetSection(sectionName));
+            sc.Configure<YobaDbFactory.Config>(host.Configuration.GetSection(sectionName));
+
+            sc.AddLogging(lb =>
+            {
+                lb.ClearProviders();
+                lb.SetMinimumLevel(LogLevel.Trace);
+                lb.AddNLog();
+            });
+
+            sc.AddSingleton<IMiddleware<Message>, LogMiddleware>();
             sc.AddSingleton<IProvider<Message>, TelegramTextProvider>();
-            sc.AddSingleton<ITelegramBotClient>(_ => CreateTelegramBotClient(config));
+            sc.AddSingleton<ITelegramBotClient>(_ => CreateTelegramBotClient(serviceConfig));
             sc.AddSingleton<IRandomGenerator, ThreadLocalRandom>();
 
             //sc.AddScoped(_ => CreateUpgraderOptions());
-            sc.AddSingleton<IYobaDbFactory>(_ => new YobaDbFactory(config.ConnectionString));
+            sc.AddSingleton<IYobaDbFactory, YobaDbFactory>();
             sc.AddSingleton<IProfileDao, ProfileDao>();
             sc.AddSingleton<INoteDao, NoteDao>();
 
@@ -56,11 +64,11 @@ namespace Yoba.Bot.App
             sc.AddSingleton<IController<Message>, ProfileController>();
             sc.AddSingleton<IController<Message>, NoteController>();
             sc.AddSingleton<BotHandler<Message>>();
-            
+
             sc.AddHostedService<BotService>();
         }
 
-        static TelegramBotClient CreateTelegramBotClient(BotServiceConfig config)
+        static TelegramBotClient CreateTelegramBotClient(BotService.Config config)
         {
             if (config.Proxy == null)
                 return new TelegramBotClient(config.TelegramToken);

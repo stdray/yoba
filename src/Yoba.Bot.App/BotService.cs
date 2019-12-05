@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,11 +15,11 @@ namespace Yoba.Bot.App
     public class BotService : IHostedService
     {
         readonly IServiceProvider _serviceProvider;
-        readonly IOptions<BotServiceConfig> _config;
+        readonly IOptions<Config> _config;
         readonly ITelegramBotClient _telegram;
         CancellationToken _cancel = CancellationToken.None;
 
-        public BotService(IServiceProvider serviceProvider, IOptions<BotServiceConfig> config)
+        public BotService(IServiceProvider serviceProvider, IOptions<Config> config)
         {
             _serviceProvider = serviceProvider;
             _config = config;
@@ -44,9 +45,9 @@ namespace Yoba.Bot.App
         void OnMessage(object sender, MessageEventArgs e)
         {
             var msg = e.Message;
-            if (msg.Chat.Id != _config.Value.GroupChatId
-                || msg.ForwardFrom != null 
-                || msg.ForwardFromChat != null 
+            if (_config.Value.GroupChatId?.Contains(msg.Chat.Id) != true
+                || msg.ForwardFrom != null
+                || msg.ForwardFromChat != null
                 || msg.From.IsBot)
             {
                 return;
@@ -56,6 +57,14 @@ namespace Yoba.Bot.App
                 var handler = scope.ServiceProvider.GetService<BotHandler<Message>>();
                 handler.Handle(new Request<Message>(e.Message), _cancel);
             }
+        }
+
+        public class Config
+        {
+            public string TelegramToken { get; set; }
+            public long[] GroupChatId { get; set; }
+            public Socks5ProxyConfig Proxy { get; set; }
+            public string ConnectionString { get; set; }
         }
     }
 }

@@ -12,17 +12,14 @@ namespace Yoba.Bot
         public BotHandler(IEnumerable<IController<TMsg>> controllers, IEnumerable<IMiddleware<TMsg>> middlewares = null)
         {
             _controllers = controllers;
-            _middlewares ??= new List<IMiddleware<TMsg>>();
+            _middlewares = middlewares ?? new List<IMiddleware<TMsg>>();
         }
 
         public async Task<Result> Handle(Request<TMsg> request, CancellationToken cancel)
         {
             var result = Result.Skip();
             foreach (var middleware in _middlewares)
-            {
-                await middleware.Execute(request, cancel);
-            }
-
+                await middleware.BeforeHandle(request, cancel);
             foreach (var handler in _controllers)
             {
                 result = await handler.Handle(request, cancel);
@@ -31,7 +28,8 @@ namespace Yoba.Bot
                     break;
                 }
             }
-
+            foreach (var middleware in _middlewares)
+                await middleware.AfterHandle(request, result, cancel);
             return result;
         }
     }

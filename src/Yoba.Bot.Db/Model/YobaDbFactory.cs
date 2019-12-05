@@ -2,28 +2,37 @@ using System;
 using System.Diagnostics;
 using LinqToDB;
 using LinqToDB.Data;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Yoba.Bot.Db
 {
     public class YobaDbFactory : IYobaDbFactory
     {
-        readonly string _provider;
+        readonly IOptions<Config> _config;
 
-        public YobaDbFactory(string connectionString, string provider = ProviderName.SQLiteClassic)
+        public YobaDbFactory(ILogger<YobaDb> log, IOptions<Config> config)
         {
-            ConnectionString = connectionString;
-            _provider = provider;
-            
-            DataConnection.TurnTraceSwitchOn();
-            DataConnection.TurnTraceSwitchOn();
-            DataConnection.WriteTraceLine = (x, y) => Console.WriteLine("{0}{1}", x, y);
+            _config = config;
+            if (_config.Value.LogSqlStatements)
+            {
+                DataConnection.TurnTraceSwitchOn();
+                DataConnection.WriteTraceLine = (message, displayName) =>
+                    log.LogDebug("{displayName}: {message}", displayName, message);
+            }
         }
 
-        public string ConnectionString { get; }
 
         public YobaDb Create()
         {
-            return new YobaDb(_provider, ConnectionString);
+            return new YobaDb(_config.Value.Provider, _config.Value.ConnectionString);
+        }
+
+        public class Config
+        {
+            public string ConnectionString { get; set; }
+            public bool LogSqlStatements { get; set; }
+            public string Provider { get; set; } = ProviderName.SQLiteClassic;
         }
     }
 }

@@ -7,6 +7,8 @@
 
   <ItemGroup>
     <PackageReference Include="linq2db.SQLite" Version="2.9.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup>
