@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Threading;
 using LinqToDB;
 using LinqToDB.Data;
 using Microsoft.Extensions.Logging;
@@ -9,12 +10,14 @@ namespace Yoba.Bot.Db
 {
     public class YobaDbFactory : IYobaDbFactory
     {
+        static int _logSet = 0;
         readonly IOptions<Config> _config;
 
         public YobaDbFactory(ILogger<YobaDb> log, IOptions<Config> config)
         {
             _config = config;
-            if (_config.Value.LogSqlStatements)
+            if (_config.Value.LogSqlStatements
+                && Interlocked.CompareExchange(ref _logSet, 1, 0) == 0)
             {
                 DataConnection.TurnTraceSwitchOn();
                 DataConnection.WriteTraceLine = (message, displayName) =>

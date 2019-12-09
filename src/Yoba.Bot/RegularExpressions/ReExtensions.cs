@@ -13,7 +13,7 @@ namespace Yoba.Bot.RegularExpressions
             Clean(match.Groups[name].Captures);
         
         public static string Value(this Match match, string name) => 
-            Clean(match.Groups[name].Captures).Single();
+            Clean(match.Groups[name].Captures).SingleOrDefault();
 
         public static IEnumerable<string> Clean(CaptureCollection captures)
         {

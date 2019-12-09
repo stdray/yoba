@@ -73,7 +73,7 @@ namespace Yoba.Bot.Telegram
 
         void AddProfileKarma()
         {
-            Re MakeRule(Re cmd) => ((bot + s).opt + cmd + s + phrase("name")) | (phrase("name") + s + cmd);
+            Re MakeRule(Re cmd) => ((bot + s).opt + cmd + s + phrase("name")) | (phrase("name") + s + cmd) | cmd;
 
             MatchHandle<Message> MakeHandle(Func<Guid, CancellationToken, Task> upd, string text) =>
                 async (request, match, cancel) =>
@@ -81,7 +81,17 @@ namespace Yoba.Bot.Telegram
                     var from = await _dao.FindProfile(request.Message.From.Username, cancel);
                     if(from == null || !from.CanVote)
                         return Ok(await _telegram.ReplyAsync(request, "Вы не можете голосовать", cancel));
-                    var to = await _dao.FindProfile(match.Value("name"), cancel);
+                    var name = match.Value("name");
+                    if (string.IsNullOrEmpty(name))
+                    {
+                        if (request.Message.ReplyToMessage != null)
+                            name = request.Message.ReplyToMessage.From.Username;
+                        else
+                            return Skip();
+                    }
+                    var to = await _dao.FindProfile(name, cancel);
+                    if (to == null)
+                        return Ok(await _telegram.ReplyAsync(request, "Профиль не найден", cancel));
                     if(from.Id == to.Id)
                         return Ok(await _telegram.ReplyAsync(request, "Нельзя менять карму самому себе", cancel));
                     await upd(to.Id, cancel);

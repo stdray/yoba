@@ -31,5 +31,6 @@ namespace Yoba.Bot
         }
 
         public Result Ok<T>(T response) => Result<T>.Success(response);
+        public Result Skip() => Result.Skip();
     }
 }
