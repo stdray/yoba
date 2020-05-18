@@ -40,7 +40,7 @@ namespace Yoba.Bot.Telegram.Middlewares
         }
 
         string Substring(string str, int maxLen) =>
-            str.Substring(0, Math.Min(maxLen, str.Length));
+            str==null ? string.Empty : str.Substring(0, Math.Min(maxLen, str.Length));
 
         public class Config
         {

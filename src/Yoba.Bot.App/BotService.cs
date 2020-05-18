@@ -55,7 +55,7 @@ namespace Yoba.Bot.App
             using (var scope = _serviceProvider.CreateScope())
             {
                 var handler = scope.ServiceProvider.GetService<BotHandler<Message>>();
-                handler.Handle(new Request<Message>(e.Message), _cancel);
+                Task.Run(() => handler.Handle(new Request<Message>(e.Message), _cancel), _cancel);
             }
         }
 

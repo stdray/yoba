@@ -12,7 +12,7 @@ namespace Yoba.Bot.Entities
         public int Loisy { get; set; }
         public int Zashkvory { get; set; }
         public int Slivi { get; set; }
-        public bool CanVote { get; set; }
+        public bool CanVote { get; set; } = true;
         public IReadOnlyCollection<string> Names { get; set; }
         public IReadOnlyCollection<YobaProfileAttribute> Attributes { get; set; }
 

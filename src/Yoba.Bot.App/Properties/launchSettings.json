@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Yoba.Bot.App": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "YobaEnv": "Production",
+        "YobaConfPath": "C:\\App\\Yoba2\\config\\private.json"
+      }
+    }
+  }
+}

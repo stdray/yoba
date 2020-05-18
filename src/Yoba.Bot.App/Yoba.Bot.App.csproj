@@ -5,12 +5,15 @@
     <UserSecretsId>c209eb7f-2334-4abc-92ce-4eca109d2c47</UserSecretsId>
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="HttpToSocks5Proxy" Version="1.4.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.0" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="1.6.1" />
-    <PackageReference Include="NLog.Schema" Version="4.6.8" />
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.112" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.4" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="1.6.3" />
+    <PackageReference Include="NLog.Schema" Version="4.7.1" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.112.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Yoba.Bot.Telegram\Yoba.Bot.Telegram.csproj" />

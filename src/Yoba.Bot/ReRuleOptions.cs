@@ -7,9 +7,6 @@ namespace Yoba.Bot
     {
         public bool ImplicitBeginEnd { get; set; } = true;
 
-        public RegexOptions RegexOptions { get; set; } =
-            Singleline
-            //Compiled;
-            ;
+        public RegexOptions RegexOptions { get; set; } = Singleline | IgnoreCase | Compiled;
     }
 }

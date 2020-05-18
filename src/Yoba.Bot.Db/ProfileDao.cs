@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using LinqToDB;
+using LinqToDB.Tools;
 using Yoba.Bot.Entities;
 
 namespace Yoba.Bot.Db
@@ -79,11 +80,14 @@ namespace Yoba.Bot.Db
 
         public async Task<YobaProfile> FindProfile(string name, CancellationToken cancel = default)
         {
+            if (string.IsNullOrEmpty(name))
+                return null;
             using (var db = _factory.Create())
             {
+                var variants = new []{ name.TrimStart('@'), name};
                 var profile = await db.Profiles
-                    .Where(p => p.MainName == name
-                                || p.ProfileNames.Any(n => n.Name == name))
+                    .Where(p => p.MainName.In(variants) 
+                           || p.ProfileNames.Any(n => n.Name.In(variants)))
                     .Select(x => new YobaProfile
                     {
                         Id = x.Id,
