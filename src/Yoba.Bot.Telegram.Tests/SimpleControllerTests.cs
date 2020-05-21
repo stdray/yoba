@@ -29,15 +29,19 @@ namespace Yoba.Bot.Tests
         [InlineData("нет", "  yoba гадай математики = гуманитарии ?  ")]
         [InlineData("гуманитарии", "  yoba вангуй математики, гуманитарии или транскоалиция   ")]
         [InlineData("batmansy", "  yoba транслитом батмансы")]
-        public async Task Bot_Response_ShouldBe_Expected(string expected, string request)
+        [InlineData("Справка:", "  еба help", true)]
+        public async Task Bot_Response_ShouldBe_Expected(string expected, string request, bool isSubstring = false)
         {
             var req = Setup.Message(request);
-            var res1 =  await _controller.Handle(req, CancellationToken.None);
+            var res1 = await _controller.Handle(req, CancellationToken.None);
             if (res1.Status == Status.Fail)
                 _output.WriteLine(res1.Exception.ToString());
             res1.Status.Should().Be(Status.Success);
-            var res2 = (Result<Message>) res1;
-            res2.Response.Text.Should().Be(expected);
+            var res2 = (Result<Message>)res1;
+            if (isSubstring)
+                res2.Response.Text.Should().Contain(expected);
+            else
+                res2.Response.Text.Should().Be(expected);
         }
     }
 }

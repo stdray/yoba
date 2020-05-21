@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -10,6 +12,7 @@ using Telegram.Bot.Types;
 using Yoba.Bot.RegularExpressions;
 using static Yoba.Bot.Telegram.Shared;
 using static Yoba.Bot.RegularExpressions.Dsl;
+using File = System.IO.File;
 
 // ReSharper disable InconsistentNaming
 
@@ -30,6 +33,20 @@ namespace Yoba.Bot.Telegram
             Version();
             Vanga();
             Translit();
+            Help();
+        }
+
+        void Help()
+        {
+            this.AddReRule(
+                bot + s + anyOf("help", "справка", "?", "-h"),
+                async (request, match, cancel) =>
+                {
+                    var dir = AppDomain.CurrentDomain.BaseDirectory;
+                    var file = Path.Combine(dir, "YobaBotHelp.txt");
+                    var text = File.ReadAllText(file);
+                    return Ok(await _telegram.ReplyAsync(request, text, cancel));
+                });
         }
 
         void Translit()
@@ -71,7 +88,7 @@ namespace Yoba.Bot.Telegram
         }
 
         void Version() => this.AddReRule(
-            bot + s+ anyOf("версия", "version"),
+            bot + s + anyOf("версия", "version"),
             async (request, _, cancel) =>
             {
                 var text = Assembly.GetExecutingAssembly().GetName().Version.ToString();

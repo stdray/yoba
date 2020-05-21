@@ -16,4 +16,10 @@
     <ProjectReference Include="..\Yoba.Bot\Yoba.Bot.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="YobaBotHelp.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

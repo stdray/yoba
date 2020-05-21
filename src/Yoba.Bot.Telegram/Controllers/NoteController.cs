@@ -82,8 +82,8 @@ namespace Yoba.Bot.Telegram
 
         void ListNotes()
         {
-            this.AddReRule(
-                bot + s + "покажи" + s + "список" + s + "заметок",
+            var list = anyOf("список" + s + "заметок", "заметки");
+            this.AddReRule(bot + s + "покажи" + s + list,
                 async (request, match, cancel) =>
                 {
                     var notes = await _dao.GetNotes(cancel);
