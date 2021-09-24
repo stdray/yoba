@@ -57,7 +57,7 @@ namespace Yoba.Bot.Telegram
                 };
 
             this.AddReRule(
-                bot + (s + "добавь").opt + s + "в" + s + "заметку" + phrase("name") + ":" + phrase("data"),
+                bot + (s + "добавь").opt + (s + "в").opt + s + "заметку" + phrase("name") + ":" + phrase("data"),
                 MakeHandle(false));
             this.AddReRule(
                 bot + s + "обнови" + s + "заметку" + phrase("name") + ":" + phrase("data"),
