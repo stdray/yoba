@@ -99,7 +99,7 @@ namespace Yoba.Bot.Telegram
                 };
 
             this.AddReRule(
-                MakeRule(anyOf("лойс", "лимон", "лаймон", "апельсин", "lois", "лайк", "нойс", "балдеж", "балдёж")),
+                MakeRule(anyOf("лойс", "лимон", "лаймон", "апельсин", "lois", "лайк", "нойс", "балдеж", "балдёж", "respect", "респект")),
                 MakeHandle(_dao.AddLois, "Лойс поставлен"));
             this.AddReRule(
                 MakeRule(anyOf("слив")),
