@@ -19,49 +19,47 @@ namespace Yoba.Bot.Db
 
         public async Task<IReadOnlyCollection<YobaNote>> GetNotes(CancellationToken cancel = default)
         {
-            using (var db = _factory.Create())
-                return await YobaNotes(db).ToListAsync(cancel);
+            using var db = _factory.Create();
+            return await YobaNotes(db).ToListAsync(cancel);
         }
 
         public async Task<YobaNote> FindNote(string name, CancellationToken cancel = default)
         {
-            using (var db = _factory.Create())
-                return await YobaNotes(db)
-                    .SingleOrDefaultAsync(x => x.Name == name, cancel);
+            using var db = _factory.Create();
+            return await YobaNotes(db)
+                .SingleOrDefaultAsync(x => x.Name == name, cancel);
         }
 
         public Task DeleteNote(YobaNote note, CancellationToken cancel = default)
         {
-            using (var db = _factory.Create())
-                return db.Notes
-                    .Where(x => x.NoteName == note.Name)
-                    .DeleteAsync(cancel);
+            using var db = _factory.Create();
+            return db.Notes
+                .Where(x => x.NoteName == note.Name)
+                .DeleteAsync(cancel);
         }
 
 
         public async Task AddOrUpdateNote(YobaNote note, CancellationToken cancel = default)
         {
             var now = DateTime.Now;
-            using (var db = _factory.Create())
+            using var db = _factory.Create();
+            var count = await db.Notes
+                .Where(x => x.NoteName == note.Name)
+                .Set(x => x.Content, _ => note.Content)
+                .Set(x => x.Updated, _ => now)
+                .UpdateAsync(cancel);
+            if (count == 1)
+                return;
+            if (count > 1)
+                throw new InvalidOperationException("Conflict");
+            await db.Notes.InsertAsync(() => new Note
             {
-                var count = await db.Notes
-                    .Where(x => x.NoteName == note.Name)
-                    .Set(x => x.Content, _ => note.Content)
-                    .Set(x => x.Updated, _ => now)
-                    .UpdateAsync(cancel);
-                if (count == 1)
-                    return;
-                if (count > 1)
-                    throw new InvalidOperationException("Conflict");
-                await db.Notes.InsertAsync(() => new Note
-                {
-                    NoteName = note.Name,
-                    DisplayNoteName = note.DisplayName,
-                    Content = note.Content,
-                    Added = now,
-                    Updated = now,
-                }, cancel);
-            }
+                NoteName = note.Name,
+                DisplayNoteName = note.DisplayName,
+                Content = note.Content,
+                Added = now,
+                Updated = now,
+            }, cancel);
         }
 
         static IQueryable<YobaNote> YobaNotes(YobaDb db) =>

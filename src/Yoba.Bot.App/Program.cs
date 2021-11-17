@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -82,7 +83,9 @@ namespace Yoba.Bot.App
             var proxy = string.IsNullOrEmpty(px.Login)
                 ? new HttpToSocks5Proxy(px.Host, px.Port)
                 : new HttpToSocks5Proxy(px.Host, px.Port, px.Login, px.Password);
-            return new TelegramBotClient(config.TelegramToken, proxy);
+            var handler = new HttpClientHandler { Proxy = proxy };
+            var httpClient = new HttpClient(handler, true);
+            return new TelegramBotClient(config.TelegramToken, httpClient);
         }
     }
 }

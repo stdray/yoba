@@ -391,3 +391,4 @@ healthchecksdb
 MigrationBackup/
 
 # End of https://www.gitignore.io/api/rider,visualstudio
+src/Yoba.Bot.App/deploy

@@ -5,9 +5,8 @@ using FakeItEasy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
+using Telegram.Bot.Requests;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
 using Xunit;
 using Yoba.Bot.Db;
 using Yoba.Bot.DbUp;
@@ -26,12 +25,12 @@ namespace Yoba.Bot.Tests
         public static T GetService<T>() => ServiceProvider.Value.GetService<T>();
 
         public static IServiceScope GetScope() => ServiceProvider.Value.CreateScope();
-        
+
         public static Request<Message> Message(string txt, string username = null) =>
             new Request<Message>(new Message
             {
                 Text = txt,
-                Chat = new Chat {Id = 1488},
+                Chat = new Chat { Id = 1488 },
                 From = new User
                 {
                     Username = username
@@ -57,15 +56,12 @@ namespace Yoba.Bot.Tests
         }
 
         static ILoggerFactory CreateLoggerFactory() =>
-            LoggerFactory.Create(f =>
-            {
-                f.AddConsole();
-            });
+            LoggerFactory.Create(f => { f.AddConsole(); });
 
         static UpgraderOptions CreateUpgraderOptions()
         {
             var conStr = $"Data Source={Guid.NewGuid()}, Mode=memory;";
-            return new UpgraderOptions {ConnectionString = conStr, AutoCreateDb = true,};
+            return new UpgraderOptions { ConnectionString = conStr, AutoCreateDb = true, };
         }
 
         static IRandomGenerator CreateRandomGenerator(int returnNum)
@@ -79,28 +75,21 @@ namespace Yoba.Bot.Tests
         static ITelegramBotClient CreateTelegramBotClient()
         {
             var telegram = A.Fake<ITelegramBotClient>();
-            A.CallTo(() => telegram.SendTextMessageAsync(
-                    A<ChatId>.Ignored,
-                    A<string>.Ignored,
-                    A<ParseMode>.Ignored,
-                    A<bool>.Ignored,
-                    A<bool>.Ignored,
-                    A<int>.Ignored,
-                    A<IReplyMarkup>.Ignored,
-                    A<CancellationToken>.Ignored))
-                .ReturnsLazily((
-                    ChatId chatId,
-                    string text,
-                    ParseMode parseMode,
-                    bool disableWebPagePreview,
-                    bool disableNotification,
-                    int replyToMessageId,
-                    IReplyMarkup replyMarkup,
-                    CancellationToken cancellationToken) => Task.FromResult(new Message
+            A.CallTo(telegram)
+                .Where(call => call.Method.Name == nameof(telegram.MakeRequestAsync))
+                .WithReturnType<Task<Message>>()
+                .ReturnsLazily(call =>
                 {
-                    Text = text,
-                    Chat = new Chat {Id = chatId.Identifier}
-                }));
+                    var request = call.Arguments.Get<SendMessageRequest>(0);
+                    var chatId = request?.ChatId.Identifier 
+                                 ?? throw new NullReferenceException(nameof(request.ChatId));
+                    var message = new Message
+                    {
+                        Text = request.Text,
+                        Chat = new Chat { Id = chatId }
+                    };
+                    return Task.FromResult(message);
+                });
             return telegram;
         }
     }

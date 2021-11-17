@@ -4,9 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
-using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 using Yoba.Bot.Telegram;
 
@@ -17,46 +17,54 @@ namespace Yoba.Bot.App
         readonly IServiceProvider _serviceProvider;
         readonly IOptions<Config> _config;
         readonly ITelegramBotClient _telegram;
-        CancellationToken _cancel = CancellationToken.None;
+        readonly ILogger<BotService> _logger;
+        CancellationTokenSource _cancellation;
+        // CancellationToken _cancel = CancellationToken.None;
 
         public BotService(IServiceProvider serviceProvider, IOptions<Config> config)
         {
             _serviceProvider = serviceProvider;
             _config = config;
             _telegram = _serviceProvider.GetService<ITelegramBotClient>();
+            _logger = _serviceProvider.GetService<ILogger<BotService>>();
         }
 
         public Task StartAsync(CancellationToken cancel)
         {
-            _telegram.OnMessage += OnMessage;
-            _telegram.StartReceiving(cancellationToken: cancel);
-            _cancel = cancel;
+            _cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancel);
+            _telegram.StartReceiving(HandleUpdateAsync, HandleErrorAsync, cancellationToken: _cancellation.Token);
             return Task.CompletedTask;
         }
 
-        public Task StopAsync(CancellationToken cancel)
+        public Task StopAsync(CancellationToken _)
         {
-            _cancel = cancel;
-            _telegram.StopReceiving();
-            _telegram.OnMessage -= OnMessage;
+            _cancellation.Cancel();
             return Task.CompletedTask;
         }
-
-        void OnMessage(object sender, MessageEventArgs e)
+        
+        async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancel)
         {
-            var msg = e.Message;
-            if (_config.Value.GroupChatId?.Contains(msg.Chat.Id) != true
-                || msg.ForwardFrom != null
-                || msg.ForwardFromChat != null
-                || msg.From.IsBot)
+            if (update.Message != null)
             {
-                return;
-            }
-            using (var scope = _serviceProvider.CreateScope())
-            {
+                var msg = update.Message;
+                if (_config.Value.GroupChatId?.Contains(msg.Chat.Id) != true
+                    || msg.ForwardFrom != null
+                    || msg.ForwardFromChat != null
+                    || msg.From?.IsBot == true)
+                {
+                    return;
+                }
+                using var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(_cancellation.Token, cancel);
+                using var scope = _serviceProvider.CreateScope();
                 var handler = scope.ServiceProvider.GetService<BotHandler<Message>>();
-                Task.Run(() => handler.Handle(new Request<Message>(e.Message), _cancel), _cancel);
+                await handler.Handle(new Request<Message>(msg), linkedToken.Token);
             }
+        }
+
+        Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancel)
+        {
+            _logger.LogError(exception, "Some error");
+            return Task.CompletedTask;
         }
 
         public class Config
