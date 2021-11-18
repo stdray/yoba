@@ -1,7 +1,6 @@
-namespace Yoba.Bot.Telegram
+namespace Yoba.Bot.Telegram;
+
+public interface IRandomGenerator
 {
-    public interface IRandomGenerator
-    {
-        int Next(int from, int to);
-    }
+    int Next(int from, int to);
 }

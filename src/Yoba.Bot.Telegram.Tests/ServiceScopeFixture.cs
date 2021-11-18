@@ -1,20 +1,18 @@
-using System;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Yoba.Bot.Tests
+namespace Yoba.Bot.Tests;
+
+public class ServiceScopeFixture : IDisposable
 {
-    public class ServiceScopeFixture : IDisposable
+    public IServiceScope Scope { get; }
+
+    public ServiceScopeFixture()
     {
-        public IServiceScope Scope { get; }
+        Scope = Setup.GetScope();
+    }
 
-        public ServiceScopeFixture()
-        {
-            Scope = Setup.GetScope();
-        }
-
-        public void Dispose()
-        {
-            Scope?.Dispose();
-        }
+    public void Dispose()
+    {
+        Scope?.Dispose();
     }
 }

@@ -1,40 +1,36 @@
-using System;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Yoba.Bot
+namespace Yoba.Bot;
+
+public class RegexAction<TMsg> : IHandler<TMsg>
 {
-    public class RegexAction<TMsg> : IHandler<TMsg>
+    readonly IProvider<TMsg, string> _textProvider;
+    readonly Regex _regex;
+    readonly MatchHandle<TMsg> _handle;
+
+    public RegexAction(IProvider<TMsg, string> textProvider, Regex regex, MatchHandle<TMsg> handle)
     {
-        readonly IProvider<TMsg, string> _textProvider;
-        readonly Regex _regex;
-        readonly MatchHandle<TMsg> _handle;
+        _textProvider = textProvider;
+        _regex = regex;
+        _handle = handle;
+    }
 
-        public RegexAction(IProvider<TMsg, string> textProvider, Regex regex, MatchHandle<TMsg> handle)
+    public async Task<Result> Handle(Request<TMsg> request, CancellationToken cancel)
+    {
+        try
         {
-            _textProvider = textProvider;
-            _regex = regex;
-            _handle = handle;
+            var text = await _textProvider.Provide(request.Message, null, cancel);
+            text = text?.Trim();
+            if (string.IsNullOrEmpty(text))
+                return Result.Skip();
+            var match = _regex.Match(text);
+            if (!match.Success)
+                return Result.Skip();
+            return await _handle(request, match, cancel);
         }
-
-        public async Task<Result> Handle(Request<TMsg> request, CancellationToken cancel)
+        catch (Exception ex)
         {
-            try
-            {
-                var text = await _textProvider.Provide(request.Message, null, cancel);
-                text = text?.Trim();
-                if (string.IsNullOrEmpty(text))
-                    return Result.Skip();
-                var match = _regex.Match(text);
-                if (!match.Success)
-                    return Result.Skip();
-                return await _handle(request, match, cancel);
-            }
-            catch (Exception ex)
-            {
-                return Result.Error(ex);
-            }
+            return Result.Error(ex);
         }
     }
 }

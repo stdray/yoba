@@ -1,24 +1,24 @@
-using System.Linq;
+
 
 // ReSharper disable InconsistentNaming
 
-namespace Yoba.Bot.RegularExpressions
+namespace Yoba.Bot.RegularExpressions;
+
+public static class Dsl
 {
-    public static class Dsl
-    {
-        public static Re phrase(string n) => anyCh.weakAny.group(n);
-        public static Re anyCh { get; } = new Const(".");
-        public static Re begin { get; } = new Const("^");
-        public static Re end { get; } = new Const("$");
-        public static Re space { get; } = new Const(@"\s");
-        public static Re s { get; } = space.oneOrMore;
-        public static Re digit { get; } = new Const(@"\d");
-        public static Re w { get; } = new Const(@"\w");
-        public static Re value(string value) => new Value(value);
-        public static Re re(string value) => new Value(value);
-        public static Re seq(Re re, params Re[] res) => res.Aggregate(re, (a, x) => a + x);
-        public static Re anyOf(Re re, params Re[] res) => res.Aggregate(re, (a, x) => a | x);
-        public static Re opt(this string v) => re(v).opt;
+    public static Re phrase(string n) => anyCh.weakAny.group(n);
+    public static Re anyCh { get; } = new Const(".");
+    public static Re begin { get; } = new Const("^");
+    public static Re end { get; } = new Const("$");
+    public static Re space { get; } = new Const(@"\s");
+    public static Re s { get; } = space.oneOrMore;
+    public static Re digit { get; } = new Const(@"\d");
+    public static Re w { get; } = new Const(@"\w");
+    public static Re value(string value) => new Value(value);
+    public static Re re(string value) => new Value(value);
+    public static Re seq(Re re, params Re[] res) => res.Aggregate(re, (a, x) => a + x);
+    public static Re anyOf(Re re, params Re[] res) => res.Aggregate(re, (a, x) => a | x);
+    public static Re opt(this string v) => re(v).opt;
 //        public static Re implicitSpaces(this Re re) => implicitSep(re, space.oneOrMore);
 //
 //        public static Re implicitSep(this Re re, Re sep)
@@ -34,5 +34,4 @@ namespace Yoba.Bot.RegularExpressions
 //                return h + sep + x;
 //            });
 //        }
-    }
 }

@@ -1,15 +1,11 @@
-using System;
-using System.Threading;
+namespace Yoba.Bot.Telegram;
 
-namespace Yoba.Bot.Telegram
+public class ThreadLocalRandom : IRandomGenerator
 {
-    public class ThreadLocalRandom : IRandomGenerator
-    {
-        static int _seed = Environment.TickCount;
+    static int _seed = Environment.TickCount;
 
-        static readonly ThreadLocal<Random> Random =
-            new ThreadLocal<Random>(() => new Random(Interlocked.Increment(ref _seed)));
+    static readonly ThreadLocal<Random> Random =
+        new ThreadLocal<Random>(() => new Random(Interlocked.Increment(ref _seed)));
 
-        public int Next(int from, int to) => Random.Value.Next(from, to);
-   }
+    public int Next(int from, int to) => Random.Value.Next(from, to);
 }

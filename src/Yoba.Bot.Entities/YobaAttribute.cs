@@ -1,10 +1,7 @@
-using System;
+namespace Yoba.Bot.Entities;
 
-namespace Yoba.Bot.Entities
+public class YobaAttribute
 {
-    public class YobaAttribute
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-    }
+    public Guid Id { get; set; }
+    public string Name { get; set; }
 }

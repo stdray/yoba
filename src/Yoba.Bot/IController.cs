@@ -1,7 +1,6 @@
-namespace Yoba.Bot
+namespace Yoba.Bot;
+
+public interface IController<TMsg> : IHandler<TMsg>
 {
-    public interface IController<TMsg> : IHandler<TMsg>
-    {
         
-    }
 }

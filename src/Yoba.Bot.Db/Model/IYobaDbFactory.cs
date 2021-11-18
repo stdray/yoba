@@ -1,7 +1,6 @@
-namespace Yoba.Bot.Db
+namespace Yoba.Bot.Db;
+
+public interface IYobaDbFactory
 {
-    public interface IYobaDbFactory
-    {
-        YobaDb Create();
-    }
+    YobaDb Create();
 }

@@ -4,7 +4,8 @@
     <OutputType>Exe</OutputType>
     <UserSecretsId>c209eb7f-2334-4abc-92ce-4eca109d2c47</UserSecretsId>
     <TargetFramework>net6.0</TargetFramework>
-    <LangVersion>latestmajor</LangVersion>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>

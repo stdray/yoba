@@ -1,11 +1,10 @@
-namespace Yoba.Bot.Db
+namespace Yoba.Bot.Db;
+
+public partial class YobaDb
 {
-    public partial class YobaDb
+    public YobaDb(string provider, string connectionString) : base(provider, connectionString)
     {
-        public YobaDb(string provider, string connectionString) : base(provider, connectionString)
-        {
-            InitDataContext();
-            InitMappingSchema();
-        }
+        InitDataContext();
+        InitMappingSchema();
     }
 }

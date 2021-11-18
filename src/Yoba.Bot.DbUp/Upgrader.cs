@@ -1,8 +1,7 @@
 ﻿using DbUp;
 using Microsoft.Extensions.Logging;
 
-namespace Yoba.Bot.DbUp
-{
+namespace Yoba.Bot.DbUp;
 //    public class Program
 //    {
 //        static int Main(string[] args)
@@ -41,32 +40,31 @@ namespace Yoba.Bot.DbUp
 //        }
 //    }
 
-    public class Upgrader
+public class Upgrader
+{
+    readonly UpgraderOptions _options;
+
+    public Upgrader(ILoggerFactory loggerFactory, UpgraderOptions options)
     {
-        readonly UpgraderOptions _options;
+        _options = options;
+        Log = loggerFactory.CreateLogger(GetType());
+    }
 
-        public Upgrader(ILoggerFactory loggerFactory, UpgraderOptions options)
-        {
-            _options = options;
-            Log = loggerFactory.CreateLogger(GetType());
-        }
+    ILogger Log { get; }
 
-        ILogger Log { get; }
-
-        public bool Upgrade()
-        {
-            Log.LogInformation("Begin upgrade");
-            var upgrader = DeployChanges.To
-                .SQLiteDatabase(_options.ConnectionString)
-                .WithScriptsEmbeddedInAssembly(GetType().Assembly)
-                .LogTo(new UpgradeLog(Log))
-                .Build();
-            var result = upgrader.PerformUpgrade();
-            if (result.Successful)
-                Log.LogInformation("End upgrade");
-            else
-                Log.LogError(result.Error, "Fail upgrade");
-            return result.Successful;
-        }
+    public bool Upgrade()
+    {
+        Log.LogInformation("Begin upgrade");
+        var upgrader = DeployChanges.To
+            .SQLiteDatabase(_options.ConnectionString)
+            .WithScriptsEmbeddedInAssembly(GetType().Assembly)
+            .LogTo(new UpgradeLog(Log))
+            .Build();
+        var result = upgrader.PerformUpgrade();
+        if (result.Successful)
+            Log.LogInformation("End upgrade");
+        else
+            Log.LogError(result.Error, "Fail upgrade");
+        return result.Successful;
     }
 }

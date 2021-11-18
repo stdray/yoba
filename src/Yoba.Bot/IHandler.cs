@@ -1,10 +1,6 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿namespace Yoba.Bot;
 
-namespace Yoba.Bot
+public interface IHandler<TMsg>
 {
-    public interface IHandler<TMsg>
-    {
-        Task<Result> Handle(Request<TMsg> request, CancellationToken cancel);
-    }
+    Task<Result> Handle(Request<TMsg> request, CancellationToken cancel);
 }

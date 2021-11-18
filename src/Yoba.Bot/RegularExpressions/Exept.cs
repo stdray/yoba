@@ -1,12 +1,9 @@
-using System;
+namespace Yoba.Bot.RegularExpressions;
 
-namespace Yoba.Bot.RegularExpressions
+public class Exept : Re
 {
-    public class Exept : Re
+    public override string ToString()
     {
-        public override string ToString()
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 }

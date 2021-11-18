@@ -1,15 +1,12 @@
-using System.Threading;
-using System.Threading.Tasks;
 using Telegram.Bot.Types;
 
-namespace Yoba.Bot.Telegram
+namespace Yoba.Bot.Telegram;
+
+public class TelegramTextProvider : IProvider<Message, string>
 {
-    public class TelegramTextProvider : IProvider<Message, string>
+    public Task<string> Provide(Message message, string defaultValue = default,
+        CancellationToken cancellation = default)
     {
-        public Task<string> Provide(Message message, string defaultValue = default,
-            CancellationToken cancellation = default)
-        {
-            return Task.FromResult(message.Text);
-        }
+        return Task.FromResult(message.Text);
     }
 }

@@ -1,8 +1,7 @@
-namespace Yoba.Bot.DbUp
+namespace Yoba.Bot.DbUp;
+
+public class UpgraderOptions
 {
-    public class UpgraderOptions
-    {
-        public string ConnectionString { get; set; }
-        public bool AutoCreateDb { get; set; }
-    }
+    public string ConnectionString { get; set; }
+    public bool AutoCreateDb { get; set; }
 }
