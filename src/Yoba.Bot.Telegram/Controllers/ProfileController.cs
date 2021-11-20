@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Yoba.Bot.Entities;
@@ -70,11 +71,11 @@ public class ProfileController : Controller<Message>
     {
         Re MakeRule(Re cmd) => ((bot + s).opt + cmd + s + phrase("name")) | (phrase("name") + s + cmd) | cmd;
 
-        MatchHandle<Message> MakeHandle(Func<Guid, CancellationToken, Task> upd, string text) =>
+        MatchHandle<Message> MakeHandle(Func<Guid, CancellationToken, Task> upd, Func<Match, string> text) =>
             async (request, match, cancel) =>
             {
                 var from = await _dao.FindProfile(request.Message.From.Username, cancel);
-                if(from == null || !from.CanVote)
+                if(from is not { CanVote: true })
                     return Ok(await _telegram.ReplyAsync(request, "Вы не можете голосовать", cancel));
                 var name = match.Value("name");
                 if (string.IsNullOrEmpty(name))
@@ -90,18 +91,32 @@ public class ProfileController : Controller<Message>
                 if(from.Id == to.Id)
                     return Ok(await _telegram.ReplyAsync(request, "Нельзя менять карму самому себе", cancel));
                 await upd(to.Id, cancel);
-                return Ok(await _telegram.ReplyAsync(request, text, cancel));
+                return Ok(await _telegram.ReplyAsync(request, text(match), cancel));
             };
 
         this.AddReRule(
-            MakeRule(anyOf("лойс", "лимон", "лаймон", "апельсин", "lois", "лайк", "нойс", "балдеж", "балдёж", "respect", "респект")),
-            MakeHandle(_dao.AddLois, "Лойс поставлен"));
+            MakeRule(anyOf("лойс", "лимон", "лаймон", "апельсин", "lois", "лайк", "нойс", 
+                "балдеж", "балдёж", "respect", "респект", "жлойс").group("lois")),
+            MakeHandle(_dao.AddLois, match =>
+            {
+                var lois = match.Value("lois").ToLower();
+                switch (lois)
+                {
+                    case "respect":
+                    case "респект": return "Респект выражен";
+                    case "жлойс": return "Лойс из жалости поставлен";
+                    default:
+                        lois = char.ToUpper(lois[0]) + lois[1..];
+                        return $"{lois} поставлен";
+                    
+                }
+            }));
         this.AddReRule(
             MakeRule(anyOf("слив")),
-            MakeHandle(_dao.AddSliv, "Слит"));
+            MakeHandle(_dao.AddSliv, _ => "Слит"));
         this.AddReRule(
             MakeRule(anyOf("зашквор", "зашквар", "zashkvor", "zashkvar")),
-            MakeHandle(_dao.AddZashkvor, "Зашквор засчитан"));
+            MakeHandle(_dao.AddZashkvor, _ => "Зашквор засчитан"));
     }
 
     void ShowProfile()

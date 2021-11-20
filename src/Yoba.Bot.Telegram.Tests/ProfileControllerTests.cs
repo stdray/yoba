@@ -67,7 +67,8 @@ public class ProfileControllerTests : IClassFixture<ProfileFixture>
             var after = await _dao.FindProfile(_profile.MainName);
             after.Loisy.Should().Be(before.Loisy);
             // Lois, sliv, Zashkvory should be incremented
-            await Handle($"ёба Лойс {_profile.MainName}", from);
+            result = await Handle($"ёба ЖлойС {_profile.MainName}", from);
+            result.Response.Text.Should().Be("Лойс из жалости поставлен");
             await Handle($"ёба слив {_profile.MainName}", from);
             await Handle($"ёба зашквор {_profile.MainName}", from);
             after = await _dao.FindProfile(_profile.MainName);
