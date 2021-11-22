@@ -1,0 +1,35 @@
+name: .NET
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: self-hosted
+    
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.head_ref }}
+        fetch-depth: 0
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore -r win-x64 src/Yoba.Bot.Telegram.sln
+    - name: Test
+      run: dotnet test --no-restore --verbosity normal src/Yoba.Bot.Telegram.Tests
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v0.9.7
+      with:
+        versionSpec: '5.x'
+    - name: Set project file versions
+      uses: gittools/actions/gitversion/execute@v0.9.7
+      with:
+        useConfigFile: true
+        additionalArguments: '/updateprojectfiles'
+    - name: Publish
+      run: dotnet publish src/Yoba.Bot.App -c Release -r win-x64 --self-contained false -f net6.0 --no-restore -o src/Yoba.Bot.App/bin/publish
